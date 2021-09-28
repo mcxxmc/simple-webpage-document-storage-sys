@@ -1,0 +1,4 @@
+{
+    "0": {"id": "0", "dir": true, "name": "default dir", "level": 1, "link": ["1"]},
+    "1": {"id": "1", "dir": false, "name": "default txt", "level": 2, "link": ["D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/txt/0.txt"]}
+}
