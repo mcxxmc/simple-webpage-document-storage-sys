@@ -1,4 +1,4 @@
-package file_sys
+package filesys
 
 type IndexesOfUsers map[string]string
 
@@ -10,4 +10,4 @@ type UserDir struct {
 	Link []string `json:"link"`
 }
 
-type UserDirs map[string]UserDir
+type UserDirs map[string]*UserDir  // passed by pointer

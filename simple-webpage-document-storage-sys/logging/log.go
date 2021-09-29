@@ -2,15 +2,17 @@ package logging
 
 import "go.uber.org/zap"
 
-// InitLog returns a logger
-func InitLog() *zap.Logger {
-	logger, _ := zap.NewProduction()
-	return logger
+var logger *zap.Logger
+
+func init() {
+	logger, _ = zap.NewProduction(zap.AddCallerSkip(1))
+	logger.Info("Logger initialized.")
 }
 
-// SetGlobal sets the global logging
-func SetGlobal(logger *zap.Logger) func() {
-	return zap.ReplaceGlobals(logger)
+// Sync synchronizes the logger; usually follows "defer"
+func Sync() {
+	logger.Sync()
+	logger.Info("Logger synchronized.")
 }
 
 // processes the passed in messages
@@ -26,21 +28,25 @@ func processMsg(msg []string) string {
 
 // Info logs the info
 func Info(msg string) {
-	zap.L().Info(msg)
+	logger.Info(msg)
+}
+
+func InfoInt(msg string, key string, val int) {
+	logger.Info(msg, zap.Int(key, val))
 }
 
 // Error logs the error
 func Error(err error, msg ...string) {
-	zap.L().Error(processMsg(msg), zap.Error(err))
+	logger.Error(processMsg(msg), zap.Error(err))
 }
 
 func Fatal(err error, msg ...string) {
-	zap.L().Fatal(processMsg(msg), zap.Error(err))
+	logger.Fatal(processMsg(msg), zap.Error(err))
 }
 
 // ConditionalLogError logs the error if the error is not nil
 func ConditionalLogError(err error, msg ...string) {
 	if err != nil {
-		zap.L().Error(processMsg(msg), zap.Error(err))
+		logger.Error(processMsg(msg), zap.Error(err))
 	}
 }

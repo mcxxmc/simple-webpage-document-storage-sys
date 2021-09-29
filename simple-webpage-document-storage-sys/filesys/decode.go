@@ -1,4 +1,4 @@
-package file_sys
+package filesys
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 )
 
 // LoadUserIndexes loads the user-index JSON from disk; should be called only once
-func LoadUserIndexes(path string) IndexesOfUsers {
+func LoadUserIndexes(path string) *IndexesOfUsers {
 	jsonFile, err := os.Open(path)
 	logging.ConditionalLogError(err)
 	defer jsonFile.Close()
@@ -19,11 +19,11 @@ func LoadUserIndexes(path string) IndexesOfUsers {
 	r := &IndexesOfUsers{}
 	err = json.Unmarshal(bytes, r)
 	logging.ConditionalLogError(err)
-	return *r
+	return r
 }
 
 // LoadUserDirs loads the JSON file that contains the info about the directories owned by a certain user
-func LoadUserDirs(path string) UserDirs {
+func LoadUserDirs(path string) *UserDirs {
 	jsonFile, err := os.Open(path)
 	logging.ConditionalLogError(err)
 	defer jsonFile.Close()
@@ -34,7 +34,7 @@ func LoadUserDirs(path string) UserDirs {
 	r := &UserDirs{}
 	err = json.Unmarshal(bytes, r)
 	logging.ConditionalLogError(err)
-	return *r
+	return r
 }
 
 // OpenTxt opens the txt file and return all the bytes as string

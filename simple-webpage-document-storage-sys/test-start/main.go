@@ -1,9 +1,16 @@
 package main
 
 import (
+	"simple-webpage-document-storage-sys/logging"
 	"simple-webpage-document-storage-sys/test"
 )
 
 func main() {
-	test.TestReadFiles()
+	defer logging.Sync()
+
+	// test reading files
+	test.ReadFiles()
+
+	// test manager
+	test.ManagerDefaultView()
 }

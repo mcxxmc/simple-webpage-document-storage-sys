@@ -9,6 +9,7 @@ import (
 	"simple-webpage-document-storage-sys/common"
 	"simple-webpage-document-storage-sys/controller"
 	"simple-webpage-document-storage-sys/logging"
+	"simple-webpage-document-storage-sys/manager"
 	"syscall"
 	"time"
 )
@@ -18,7 +19,7 @@ func addMiddleware(router *gin.Engine) {
 }
 
 func bindUrl(router *gin.Engine) {
-
+	router.GET("/default-view", controller.DefaultViewSkeleton)
 }
 
 func createServer(addr string, handler http.Handler) *http.Server {
@@ -52,11 +53,13 @@ func gracefulShutDown(server *http.Server, delay time.Duration) {
 
 
 func main() {
-	logger := logging.InitLog()
-	defer logger.Sync()
-	undo := logging.SetGlobal(logger)
-	defer undo()
+	// config the logger
+	defer logging.Sync()
 
+	// start the manager which maintains the user info
+	manager.StartManager(common.Path_index_of_users)
+
+	// config the router
 	router := gin.Default()
 	addMiddleware(router)
 	bindUrl(router)
@@ -66,3 +69,4 @@ func main() {
 }
 
 //TODO: 现在的数据库是单向连接的，只能从user到具体文档，而不能从具体文档到user;可以考虑升级成双向
+//TODO: index of users can be replaced by MySQL instead of JSON for better performance when the scale is large
