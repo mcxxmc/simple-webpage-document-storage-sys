@@ -23,8 +23,12 @@ func (manager *Manager) numberOfUsers() int {
 
 // registers a user with the manager
 func (manager *Manager) registerUser(username string) {
-	if profile, ok := (*cached)[username]; ok {
-		manager.UsersDirs[username] = filesys.LoadUserDirs(profile)
+	if _, ok := manager.UsersDirs[username]; ok {
+		logging.Info("User: " + username + " already logged in.")
+		return
+	}
+	if userInfo, ok := (*cached)[username]; ok {
+		manager.UsersDirs[username] = filesys.LoadUserDirs(userInfo.Profile)
 	} else {
 		logging.Info("Fail to register user; username invalid.")
 	}
@@ -47,6 +51,12 @@ func (manager *Manager) userDirs(username string) *filesys.UserDirs {
 	return nil
 }
 
+// returns the txt file (name and content) of a given id of a given user
+func (manager *Manager) fetchTxt(username string, fileId string) (string, string) {
+	file := (*UserDirs(username))[fileId]
+	return file.Name, filesys.OpenTxt(file.Link[0])
+}
+
 // NumberOfUsers returns the number of users logged in
 func NumberOfUsers() int {
 	return defaultManager.numberOfUsers()
@@ -65,6 +75,11 @@ func UnregisterUser(username string) {
 // UserDirs returns the directories of a given user; if the user does not exist, returns nil
 func UserDirs(username string) *filesys.UserDirs {
 	return defaultManager.userDirs(username)
+}
+
+// FetchTxt returns the txt file (name and content) of a given id of a given user
+func FetchTxt(username string, fileId string) (string, string) {
+	return defaultManager.fetchTxt(username, fileId)
 }
 
 // loads indexes of users into cache

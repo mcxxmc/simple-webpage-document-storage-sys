@@ -44,6 +44,9 @@ func OpenTxt(path string) string {
 	defer f.Close()
 
 	bytes, err := ioutil.ReadAll(f)
-	logging.ConditionalLogError(err)
+	if err != nil {
+		logging.Error(err)
+		return "Error in reading file. Please contact our team for more details."
+	}
 	return string(bytes)
 }

@@ -20,6 +20,8 @@ func addMiddleware(router *gin.Engine) {
 
 func bindUrl(router *gin.Engine) {
 	router.GET("/default-view", controller.DefaultViewSkeleton)
+
+	router.POST("/default-view", controller.GetFile)
 }
 
 func createServer(addr string, handler http.Handler) *http.Server {

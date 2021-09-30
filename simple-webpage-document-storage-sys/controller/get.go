@@ -9,6 +9,5 @@ import (
 
 func DefaultViewSkeleton(c *gin.Context) {
 	manager.RegisterUser(common.DefaultUser)
-	defer manager.UnregisterUser(common.DefaultUser)
-	c.JSON(http.StatusOK, manager.UserDirs(common.DefaultUser))
+	c.JSON(http.StatusOK, wrapUpUserDirs(manager.UserDirs(common.DefaultUser)))
 }
