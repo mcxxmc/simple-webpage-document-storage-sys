@@ -8,6 +8,6 @@ import (
 )
 
 func DefaultViewSkeleton(c *gin.Context) {
-	manager.RegisterUser(common.DefaultUser)
-	c.JSON(http.StatusOK, wrapUpUserDirs(manager.UserDirs(common.DefaultUser)))
+	manager.RegisterUser(common.DefaultUserId)
+	c.JSON(http.StatusOK, wrapUpUserDirs(manager.UserCollection(common.DefaultUserId)))
 }

@@ -23,7 +23,7 @@ func LoadUserIndexes(path string) *IndexesOfUsers {
 }
 
 // LoadUserDirs loads the JSON file that contains the info about the directories owned by a certain user
-func LoadUserDirs(path string) *UserDirs {
+func LoadUserDirs(path string) *Collection {
 	jsonFile, err := os.Open(path)
 	logging.ConditionalLogError(err)
 	defer jsonFile.Close()
@@ -31,7 +31,7 @@ func LoadUserDirs(path string) *UserDirs {
 	bytes, err := ioutil.ReadAll(jsonFile)
 	logging.ConditionalLogError(err)
 
-	r := &UserDirs{}
+	r := &Collection{}
 	err = json.Unmarshal(bytes, r)
 	logging.ConditionalLogError(err)
 	return r

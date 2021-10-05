@@ -8,7 +8,7 @@ import (
 // DefaultResponse the response for default-view GET request
 type DefaultResponse struct {
 	Tops []string `json:"tops"`  // the ids of level-1 directories
-	Dirs filesys.UserDirs `json:"dirs"`
+	Dirs filesys.Collection `json:"dirs"`
 }
 
 // FileRequest the request from user asking for an exact file; usually a counterpart of FileResponse
@@ -23,7 +23,7 @@ type FileResponse struct {
 	Content string `json:"content"`  // the file content
 }
 
-func wrapUpUserDirs(dirs *filesys.UserDirs) *DefaultResponse {
+func wrapUpUserDirs(dirs *filesys.Collection) *DefaultResponse {
 	tops := make([]string, 10)
 	for k, dir := range *dirs {
 		if dir.Level == common.RootLevel {

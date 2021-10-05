@@ -2,60 +2,10 @@ package manager
 
 import (
 	"simple-webpage-document-storage-sys/filesys"
-	"simple-webpage-document-storage-sys/logging"
 )
-
-type Manager struct {
-	// username : their dirs.
-	// Note that map, slice and channel is passed by pointer by golang, so there's no need for an additional '*'
-	UsersDirs map[string]*filesys.UserDirs
-
-	// UserTimestamp map[string]"time"
-}
 
 var defaultManager *Manager
 var cached *filesys.IndexesOfUsers  //TODO: replace this with MySQL
-
-// returns the number of users logged in
-func (manager *Manager) numberOfUsers() int {
-	return len(manager.UsersDirs)
-}
-
-// registers a user with the manager
-func (manager *Manager) registerUser(username string) {
-	if _, ok := manager.UsersDirs[username]; ok {
-		logging.Info("User: " + username + " already logged in.")
-		return
-	}
-	if userInfo, ok := (*cached)[username]; ok {
-		manager.UsersDirs[username] = filesys.LoadUserDirs(userInfo.Profile)
-	} else {
-		logging.Info("Fail to register user; username invalid.")
-	}
-}
-
-// unregisters a user with the manager
-func (manager *Manager) unregisterUser(username string) {
-	if _, ok := manager.UsersDirs[username]; ok {
-		delete(manager.UsersDirs, username)
-	} else {
-		logging.Info("Fail to unregister user; username invalid.")
-	}
-}
-
-// returns the directories of a given user; if the user does not exist, returns nil
-func (manager *Manager) userDirs(username string) *filesys.UserDirs {
-	if dirs, ok := manager.UsersDirs[username]; ok {
-		return dirs
-	}
-	return nil
-}
-
-// returns the txt file (name and content) of a given id of a given user
-func (manager *Manager) fetchTxt(username string, fileId string) (string, string) {
-	file := (*UserDirs(username))[fileId]
-	return file.Name, filesys.OpenTxt(file.Link[0])
-}
 
 // NumberOfUsers returns the number of users logged in
 func NumberOfUsers() int {
@@ -63,24 +13,48 @@ func NumberOfUsers() int {
 }
 
 // RegisterUser registers a user with the manager
-func RegisterUser(username string) {
-	defaultManager.registerUser(username)
+func RegisterUser(userId string) {
+	defaultManager.registerUser(userId)
 }
 
 // UnregisterUser unregisters a user with the manager
-func UnregisterUser(username string) {
-	defaultManager.unregisterUser(username)
+func UnregisterUser(userId string) {
+	defaultManager.unregisterUser(userId)
 }
 
-// UserDirs returns the directories of a given user; if the user does not exist, returns nil
-func UserDirs(username string) *filesys.UserDirs {
-	return defaultManager.userDirs(username)
+// UserCollection returns the directories of a given user; if the user does not exist, returns nil
+func UserCollection(userId string) *filesys.Collection {
+	return defaultManager.userCollection(userId)
 }
 
-// FetchTxt returns the txt file (name and content) of a given id of a given user
-func FetchTxt(username string, fileId string) (string, string) {
-	return defaultManager.fetchTxt(username, fileId)
+// FetchTxt returns the txt file (name and content) by its id of and the user that owns it
+func FetchTxt(userId string, fileId string) (string, string) {
+	return defaultManager.fetchTxt(userId, fileId)
 }
+
+// ModifyTxt modifies a txt file
+func ModifyTxt(userId string, fileId string, newContent string) bool {
+	return defaultManager.modifyTxt(userId, fileId, newContent)
+}
+
+// CreateTxt creates a txt file with content
+func CreateTxt(userId string, newFileId string, level int, newFileName string, newContent string) bool {
+	return defaultManager.createTxt(userId, newFileId, level, newFileName, newContent)
+}
+
+// DeleteTxt deletes a txt file
+func DeleteTxt(userId string, fileId string) bool {
+	return defaultManager.deleteTxt(userId, fileId)
+}
+
+// MoveTxt moves a txt file (within the range of a user);
+//
+// it does not move the real files on the disk due to the special design of this project
+func MoveTxt(userId string, fileId string, newParentId string) bool {
+	return defaultManager.moveTxt(userId, fileId, newParentId)
+}
+
+
 
 // loads indexes of users into cache
 func prepareCache(path string) {
@@ -91,7 +65,7 @@ func prepareCache(path string) {
 // must be called before any other function calls
 func StartManager(path string) {
 	prepareCache(path)
-	defaultManager = &Manager{UsersDirs: make(map[string]*filesys.UserDirs)}
+	defaultManager = &Manager{Collections: make(map[string]*filesys.Collection)}
 }
 
-//TODO: add a timer to manager to remove some logged users that have been idle for long
+

@@ -1,6 +1,6 @@
 package common
 
-const DefaultUser = "default"
+const DefaultUserId = "0"
 
 const Port = ":8080"
 

@@ -2,7 +2,7 @@ const urlDefaultView = "http://localhost:8080/default-view"
 const dirIdPrefix = "dir_"
 const fileIdPrefix = "file_"
 const tab ="&nbsp&nbsp&nbsp&nbsp"
-const defaultUserId = "default"
+const defaultUserId = "0"
 
 /**
  * returns an id for directory
@@ -69,11 +69,11 @@ function recursivelyAppend(dirs, cur, dep, maxDep=24) {
     try {
         let dir = dirs[cur];
         if (dir["dir"] == true) {
-            let links = dir["link"];
+            let children = dir["children"];
             appendDir(dir["id"], dir["name"], dir["level"]);
-            if (links.length > 0) {
-                for (let i = 0; i < links.length; i ++) {
-                    recursivelyAppend(dirs, links[i], dep + 1);
+            if (children.length > 0) {
+                for (let i = 0; i < children.length; i ++) {
+                    recursivelyAppend(dirs, children[i], dep + 1);
                 }
             }
         } else {

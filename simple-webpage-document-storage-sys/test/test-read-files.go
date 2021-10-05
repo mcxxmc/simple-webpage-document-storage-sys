@@ -8,11 +8,11 @@ import (
 
 func ReadFiles() {
 	userindexes := *filesys.LoadUserIndexes(common.Path_index_of_users)
-	nxt := userindexes[common.DefaultUser]
+	nxt := userindexes[common.DefaultUserId]
 	userdirs := *filesys.LoadUserDirs(nxt.Profile)
 	for _, v := range userdirs {
 		if v.Dir == false {
-			logging.Info(filesys.OpenTxt(v.Link[0]))
+			logging.Info(filesys.OpenTxt(v.Children[0]))
 		}
 	}
 }
