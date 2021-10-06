@@ -38,8 +38,8 @@ func ModifyTxt(userId string, fileId string, newContent string) bool {
 }
 
 // CreateTxt creates a txt file with content
-func CreateTxt(userId string, newFileId string, level int, newFileName string, newContent string) bool {
-	return defaultManager.createTxt(userId, newFileId, level, newFileName, newContent)
+func CreateTxt(userId string, newFileId string, level int, newFileName string, newContent string, parentId string) bool {
+	return defaultManager.createTxt(userId, newFileId, level, newFileName, newContent, parentId)
 }
 
 // DeleteTxt deletes a txt file

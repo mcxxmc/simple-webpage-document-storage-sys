@@ -33,7 +33,7 @@ func createServer(addr string, handler http.Handler) *http.Server {
 
 func run(server *http.Server) {
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logging.Fatal(err, "Failed to start the server.")
+		logging.Fatal(err, logging.S("detail: ", "failed to start the server."))
 	}
 }
 
@@ -47,7 +47,7 @@ func gracefulShutDown(server *http.Server, delay time.Duration) {
 	ctx, cancel := context.WithTimeout(context.Background(), delay)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		logging.Fatal(err, "Server shutdown.")
+		logging.Fatal(err, logging.S("detail: ", "Server shutdown."))
 	}
 
 	logging.Info("Server exits.")

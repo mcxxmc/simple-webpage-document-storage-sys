@@ -2,6 +2,7 @@ package logging
 
 import "go.uber.org/zap"
 
+// the default logger
 var logger *zap.Logger
 
 func init() {
@@ -15,38 +16,26 @@ func Sync() {
 	logger.Info("Logger synchronized.")
 }
 
-// processes the passed in messages
-func processMsg(msg []string) string {
-	write := ""
-	if len(msg) > 0 {
-		for _, s := range msg {
-			write = write + s
-		}
-	}
-	return write
-}
-
 // Info logs the info
-func Info(msg string) {
-	logger.Info(msg)
-}
-
-func InfoInt(msg string, key string, val int) {
-	logger.Info(msg, zap.Int(key, val))
+func Info(msg string, sss ...SS) {
+	logger.Info(msg, convert(sss)...)
 }
 
 // Error logs the error
-func Error(err error, msg ...string) {
-	logger.Error(processMsg(msg), zap.Error(err))
+func Error(err error, sss ...SS) {
+	fields := append([]zap.Field{zap.Error(err)}, convert(sss)...)
+	logger.Error("", fields...)
 }
 
-func Fatal(err error, msg ...string) {
-	logger.Fatal(processMsg(msg), zap.Error(err))
+// Fatal logs the error and stops the program
+func Fatal(err error, sss ...SS) {
+	fields := append([]zap.Field{zap.Error(err)}, convert(sss)...)
+	logger.Fatal("", fields...)
 }
 
 // ConditionalLogError logs the error if the error is not nil
-func ConditionalLogError(err error, msg ...string) {
+func ConditionalLogError(err error, sss ...SS) {
 	if err != nil {
-		logger.Error(processMsg(msg), zap.Error(err))
+		Error(err, sss...)
 	}
 }

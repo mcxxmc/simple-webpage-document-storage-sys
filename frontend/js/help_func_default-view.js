@@ -28,7 +28,9 @@ function makeFileId(fileId) {
  * @returns {string}
  */
 function levelIndention(level) {
-    if (level <= 1) {
+    if (level == 0) {
+        return ""
+    } else if (level == 1) {
         return tab;
     } else {
         return tab + levelIndention(level - 1)
@@ -42,7 +44,7 @@ function levelIndention(level) {
  * @param {number} dirLevel 
  */
 function appendDir(dirId, dirName, dirLevel) {
-    $("#div_directories").append(levelIndention(dirLevel) + "<p 'id'=" + makeDirId(dirId) + "class='directories'>" + dirName + "</p><br>");
+    $("#div_directories").append("<p 'id'=" + makeDirId(dirId) + "class='directories'>" + levelIndention(dirLevel) + dirName + "</p><br>");
 }
 
 /**
@@ -52,7 +54,8 @@ function appendDir(dirId, dirName, dirLevel) {
  * @param {number} fileLevel 
  */
 function appendFile(fileId, fileName, fileLevel) {
-    $("#div_directories").append(levelIndention(fileLevel) + "<a 'id'=" + makeFileId(fileId) + " href='javascript:void(0)' class='files' onClick='clickFile(" + fileId + ")'>" + fileName + "</a><br>");
+    $("#div_directories").append("<a 'id'=" + makeFileId(fileId) + 
+    " href='javascript:void(0)' class='files' onClick='clickFile(" + fileId + ")'>" + levelIndention(fileLevel) + fileName + "</a><br>");
 }
 
 /**
@@ -70,8 +73,8 @@ function recursivelyAppend(dirs, cur, dep, maxDep=24) {
         let dir = dirs[cur];
         if (dir["dir"] == true) {
             let children = dir["children"];
-            appendDir(dir["id"], dir["name"], dir["level"]);
-            if (children.length > 0) {
+            appendDir(dir["id"], dir["name"], dir["level"]);  // append the current dir
+            if (children.length > 0) {  // append its children
                 for (let i = 0; i < children.length; i ++) {
                     recursivelyAppend(dirs, children[i], dep + 1);
                 }
@@ -91,14 +94,9 @@ function recursivelyAppend(dirs, cur, dep, maxDep=24) {
  *     "dirs"
  */
 function dispalyDirectories(data) {
-    let tops = data["tops"];
+    let top = data["top"];
     let dirs = data["dirs"];
-    for (let i = 0; i < tops.length; i ++) {
-        if (tops[i] != "") {
-            recursivelyAppend(dirs, tops[i], 0);
-        }
-    }
-
+    recursivelyAppend(dirs, top, 0);
 }
 
 /**
