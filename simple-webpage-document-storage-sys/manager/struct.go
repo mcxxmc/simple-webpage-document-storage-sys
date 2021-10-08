@@ -63,12 +63,12 @@ func (manager *Manager) fetchTxt(userId string, fileId string) (string, string) 
 
 	img, exist := collection[fileId]
 	if exist == false {
-		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1fileId, fileId))
+		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1userId, userId), logging.S(s1fileId, fileId))
 		return "", ""
 	}
 
 	if img.Dir == true {
-		logging.Error(errors.New(errorNotATxt), logging.S(s1fileId, fileId))
+		logging.Error(errors.New(errorNotATxt), logging.S(s1userId, userId), logging.S(s1fileId, fileId))
 		return "", ""
 	}
 
@@ -86,12 +86,12 @@ func (manager *Manager) modifyTxt(userId string, fileId string, newContent strin
 
 	img, exist := collection[fileId]
 	if exist == false {
-		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1fileId, fileId))
+		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1userId, userId), logging.S(s1fileId, fileId))
 		return false
 	}
 
 	if img.Dir == true {
-		logging.Error(errors.New(errorNotATxt), logging.S(s1fileId, fileId))
+		logging.Error(errors.New(errorNotATxt), logging.S(s1userId, userId), logging.S(s1fileId, fileId))
 		return false
 	}
 
@@ -99,8 +99,13 @@ func (manager *Manager) modifyTxt(userId string, fileId string, newContent strin
 }
 
 // creates a txt file with content
-func (manager *Manager) createTxt(userId string, newFileId string, level int, newFileName string,
+func (manager *Manager) createTxt(userId string, newFileId string, newFileName string,
 	newContent string, parentId string) bool {
+
+	if parentId == common.RootParentId {
+		logging.Error(errors.New(errorUnauthorizedRoot), logging.S(s1userId, userId), logging.S(s1fileId, newFileId))
+		return false
+	}
 
 	collection := *manager.userCollection(userId)
 
@@ -112,18 +117,20 @@ func (manager *Manager) createTxt(userId string, newFileId string, level int, ne
 
 	// check if the newFileId is valid
 	if _, exist := collection[newFileId]; exist == true {
-		logging.Error(errors.New(errorFileIdAlreadyExists), logging.S(s1fileId, newFileId))
+		logging.Error(errors.New(errorFileIdAlreadyExists), logging.S(s1userId, userId), logging.S(s1fileId, newFileId))
 		return false
 	}
 
 	// check if the parentId is valid
-	if _, exist := collection[parentId]; exist != true {
+	parent, exist := collection[parentId]
+	if exist != true {
 		logging.Error(errors.New(errorInvalidNewParentId), logging.S(s1parentId, parentId))
 		return false
 	}
 
 	// create a new Image
 	newPath := common.NewTxtPath(newFileName, userId)
+	level := parent.Level + 1
 	newImg := &filesys.Image{ID: newFileId, Dir: false, Name: newFileName, Level: level,
 		Children: []string{newPath}, Parent: parentId}
 
@@ -147,18 +154,18 @@ func (manager *Manager) deleteTxt(userId string, fileId string) bool {
 
 	img, exist := collection[fileId]
 	if exist == false {
-		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1fileId, fileId))
+		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1userId, userId), logging.S(s1fileId, fileId))
 		return false
 	}
 
 	if img.Dir == true {
-		logging.Error(errors.New(errorNotATxt), logging.S(s1fileId, fileId))
+		logging.Error(errors.New(errorNotATxt), logging.S(s1userId, userId), logging.S(s1fileId, fileId))
 		return false
 	}
 
 	oldParent, exist := collection[img.Parent]
 	if exist != true {
-		logging.Error(errors.New(errorInvalidOldParentId), logging.S(s1parentId, img.Parent))
+		logging.Error(errors.New(errorInvalidOldParentId), logging.S(s1userId, userId), logging.S(s1parentId, img.Parent))
 		return false
 	}
 
@@ -172,10 +179,10 @@ func (manager *Manager) deleteTxt(userId string, fileId string) bool {
 	}
 }
 
-// moves a txt file (within the range of a user);
+// moves a txt file or a directory (within the range of a user);
 //
 // it does not move the real files on the disk due to the special design of this project
-func (manager *Manager) moveTxt(userId string, fileId string, newParentId string) bool {
+func (manager *Manager) move(userId string, objectId string, newParentId string) bool {
 	collection := *manager.userCollection(userId)
 
 	if collection == nil {
@@ -190,9 +197,13 @@ func (manager *Manager) moveTxt(userId string, fileId string, newParentId string
 		return false
 	}
 
-	img, exist := collection[fileId]
+	if newParent.Dir == false {
+		logging.Error(errors.New(errorNotADir), logging.S(s1parentId, newParentId))
+	}
+
+	img, exist := collection[objectId]
 	if exist == false {
-		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1fileId, fileId))
+		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1userId, userId), logging.S(s1objectId, objectId))
 		return false
 	}
 
@@ -200,14 +211,113 @@ func (manager *Manager) moveTxt(userId string, fileId string, newParentId string
 	oldParent, exist := collection[oldParentId]
 
 	if exist == false {
-		logging.Error(errors.New(errorInvalidOldParentId), logging.S(s1parentId, oldParentId))
+		logging.Error(errors.New(errorInvalidOldParentId), logging.S(s1userId, userId), logging.S(s1parentId, oldParentId))
 		return false
 	}
 
-	oldParent.Children = removeString(oldParent.Children, fileId)
+	oldParent.Children = removeString(oldParent.Children, objectId)
 
 	img.Parent = newParentId
-	newParent.Children = append(newParent.Children, fileId)
+	img.Level = newParent.Level + 1
+	newParent.Children = append(newParent.Children, objectId)
 
+	return true
+}
+
+// renames a file or a directory
+func (manager *Manager) rename(userId string, objectId string, newName string) bool {
+	collection := *manager.userCollection(userId)
+
+	if collection == nil {
+		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
+		return false
+	}
+
+	img, exist := collection[objectId]
+	if exist == false {
+		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1userId, userId), logging.S(s1objectId, objectId))
+		return false
+	}
+
+	img.Name = newName
+	return true
+}
+
+// creates a new directory
+func (manager *Manager) createDir(userId string, newDirId string, newDirName string, parentId string) bool {
+	if parentId == common.RootParentId {
+		logging.Error(errors.New(errorUnauthorizedRoot), logging.S(s1userId, userId), logging.S(s1dirId, newDirId))
+		return false
+	}
+
+	collection := *manager.userCollection(userId)
+
+	// check if the user id is valid
+	if collection == nil {
+		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
+		return false
+	}
+
+	// check if the newDirId is valid
+	if _, exist := collection[newDirId]; exist == true {
+		logging.Error(errors.New(errorDirIdAlreadyExists), logging.S(s1userId, userId), logging.S(s1dirId, newDirId))
+		return false
+	}
+
+	// check if the parentId is valid
+	parent, exist := collection[parentId]
+	if exist != true {
+		logging.Error(errors.New(errorInvalidNewParentId), logging.S(s1parentId, parentId))
+		return false
+	}
+
+	// create a new Image
+	level := parent.Level + 1
+	newImg := &filesys.Image{ID: newDirId, Dir: true, Name: newDirName, Level: level,
+		Children: []string{}, Parent: parentId}
+
+	// append that Image to Collection
+	collection[newDirId] = newImg
+
+	// append the new txt as a child to its parent
+	collection[parentId].Children = append(collection[parentId].Children, newDirId)
+
+	return true
+}
+
+// deletes a directory (only works when the directory is empty)
+func (manager *Manager) deleteDir(userId string, dirId string) bool {
+	collection := *manager.userCollection(userId)
+
+	// check if the user id is valid
+	if collection == nil {
+		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
+		return false
+	}
+
+	img, exist := collection[dirId]
+	if exist == false {
+		logging.Error(errors.New(errorDirIdNotExist), logging.S(s1userId, userId), logging.S(s1dirId, dirId))
+		return false
+	}
+
+	if img.Dir == false {
+		logging.Error(errors.New(errorNotADir), logging.S(s1userId, userId), logging.S(s1dirId, dirId))
+		return false
+	}
+
+	if len(img.Children) > 0 {
+		logging.Error(errors.New(errorDirNotEmpty), logging.S(s1userId, userId), logging.S(s1dirId, dirId))
+		return false
+	}
+
+	oldParent, exist := collection[img.Parent]
+	if exist != true {
+		logging.Error(errors.New(errorInvalidOldParentId), logging.S(s1userId, userId), logging.S(s1parentId, img.Parent))
+		return false
+	}
+
+	oldParent.Children = removeString(oldParent.Children, dirId)
+	delete(collection, dirId)
 	return true
 }

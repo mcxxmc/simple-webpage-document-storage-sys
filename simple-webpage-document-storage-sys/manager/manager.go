@@ -38,8 +38,8 @@ func ModifyTxt(userId string, fileId string, newContent string) bool {
 }
 
 // CreateTxt creates a txt file with content
-func CreateTxt(userId string, newFileId string, level int, newFileName string, newContent string, parentId string) bool {
-	return defaultManager.createTxt(userId, newFileId, level, newFileName, newContent, parentId)
+func CreateTxt(userId string, newFileId string, newFileName string, newContent string, parentId string) bool {
+	return defaultManager.createTxt(userId, newFileId, newFileName, newContent, parentId)
 }
 
 // DeleteTxt deletes a txt file
@@ -51,7 +51,34 @@ func DeleteTxt(userId string, fileId string) bool {
 //
 // it does not move the real files on the disk due to the special design of this project
 func MoveTxt(userId string, fileId string, newParentId string) bool {
-	return defaultManager.moveTxt(userId, fileId, newParentId)
+	return defaultManager.move(userId, fileId, newParentId)
+}
+
+// RenameTxt renames a txt file
+func RenameTxt(userId string, fileId string, newName string) bool {
+	return defaultManager.rename(userId, fileId, newName)
+}
+
+// RenameDir renames a directory
+func RenameDir(userId string, dirId string, newName string) bool {
+	return defaultManager.rename(userId, dirId, newName)
+}
+
+// MoveDir moves a directory (within the range of a user);
+//
+// it does not move the real files on the disk due to the special design of this project
+func MoveDir(userId string, dirId string, newParentId string) bool {
+	return defaultManager.move(userId, dirId, newParentId)
+}
+
+// CreateDir creates a new directory
+func CreateDir(userId string, newDirId string, newDirName string, parentId string) bool {
+	return defaultManager.createDir(userId, newDirId, newDirName, parentId)
+}
+
+// DeleteDir deletes a new directory (the directory needs to be empty)
+func DeleteDir(userId string, dirId string) bool {
+	return defaultManager.deleteDir(userId, dirId)
 }
 
 
