@@ -7,14 +7,17 @@ import (
 	"simple-webpage-document-storage-sys/manager"
 )
 
+const userId = common.DefaultUserId
+const dirId1 = "1001"
+const dirId2 = "1002"
+
+const newDirId1 = "dir1"
+const newDirId2 = "dir2"
+const newFileId1 = "file1"
+const newFileId2 = "file2"
+
 // ManagerDefaultView tests using the default user
 func ManagerDefaultView() {
-	userId := common.DefaultUserId
-	dirId1 := "1001"
-	dirId2 := "1002"
-
-	newDirId1 := "dir1"
-	newFileId1 := "file1"
 
 	n := manager.NumberOfUsers()
 	if n != 0 {
@@ -29,18 +32,19 @@ func ManagerDefaultView() {
 	}
 
 	// Test dir & txt:
+	// PART1: without saving
 	// create new dir
-	testDirName := "TestDir1"
-	yes := manager.CreateDir(userId, newDirId1, testDirName, common.RootId)
+	testDirName1 := "TestDir1"
+	yes := manager.CreateDir(userId, newDirId1, testDirName1, common.RootId)
 	if yes == false {
 		logging.Fatal(errors.New("fails to create a new directory"))
 	}
 
 	// create new txt file
-	testFileName := "TestFile1"
-	testFileContent := "ManagerDefaultView(): test file 1."
-	yes = manager.CreateTxt(userId, newFileId1, testFileName,
-		testFileContent, newDirId1)
+	testFileName1 := "TestFile1"
+	testFileContent1 := "ManagerDefaultView(): test file 1."
+	yes = manager.CreateTxt(userId, newFileId1, testFileName1,
+		testFileContent1, newDirId1)
 
 	if yes == false {
 		logging.Fatal(errors.New("fails to create txt"))
@@ -48,13 +52,13 @@ func ManagerDefaultView() {
 
 	// fetch txt
 	name, ctx := manager.FetchTxt(userId, newFileId1)
-	if name != testFileName || ctx != testFileContent {
+	if name != testFileName1 || ctx != testFileContent1 {
 		logging.Fatal(errors.New("file name or content does not match"))
 	}
 
 	// rename the dir
-	testDirNameNew := "NewTestDir1"
-	yes = manager.RenameDir(userId, newDirId1, testDirNameNew)
+	testDirName2 := "TestDir2"
+	yes = manager.RenameDir(userId, newDirId1, testDirName2)
 	if yes == false {
 		logging.Fatal(errors.New("fails to rename directory"))
 	}
@@ -85,21 +89,21 @@ func ManagerDefaultView() {
 	}
 
 	// modify txt & changes txt name
-	testFileNameNew := "NewTestFile1"
-	testFileContentNew := "ManagerDefaultView(): new test file 1."
+	testFileName2 := "TestFile2"
+	testFileContent2 := "ManagerDefaultView(): test file 2."
 
-	yes = manager.ModifyTxt(common.DefaultUserId, newFileId1, testFileContentNew)
+	yes = manager.ModifyTxt(common.DefaultUserId, newFileId1, testFileContent2)
 	if yes == false {
 		logging.Fatal(errors.New("fails to modify txt"))
 	}
 
-	yes = manager.RenameTxt(common.DefaultUserId, newFileId1, testFileNameNew)
+	yes = manager.RenameTxt(common.DefaultUserId, newFileId1, testFileName2)
 	if yes == false {
 		logging.Fatal(errors.New("fails to rename txt"))
 	}
 
 	name, ctx = manager.FetchTxt(common.DefaultUserId, newFileId1)
-	if name != testFileNameNew || ctx != testFileContentNew {
+	if name != testFileName2 || ctx != testFileContent2 {
 		logging.Fatal(errors.New("file name or content does not match"))
 	}
 
@@ -109,6 +113,22 @@ func ManagerDefaultView() {
 	if yes == false {
 		logging.Fatal(errors.New("fails to delete txt"))
 	}
+
+	//PART2: with saving
+	testDirName3 := "TestDir3"
+	yes = manager.CreateDir(userId, newDirId2, testDirName3, dirId2)
+	if yes == false {
+		logging.Fatal(errors.New("fails to create a new directory"))
+	}
+	testFileName3 := "TestFile3"
+	testFileContent3 := "ManagerDefaultView(): test file 3."
+	yes = manager.CreateTxt(userId, newFileId2, testFileName3,
+		testFileContent3, newDirId2)
+	if yes == false {
+		logging.Fatal(errors.New("fails to create txt"))
+	}
+	manager.SaveUserCollection(userId)
+
 
 	// Test: log out
 	manager.UnregisterUser(common.DefaultUserId)

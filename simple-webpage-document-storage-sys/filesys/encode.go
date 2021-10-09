@@ -1,6 +1,7 @@
 package filesys
 
 import (
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
@@ -44,4 +45,14 @@ func DeleteTxt(path string, args...string) bool {
 		return false
 	}
 	return true
+}
+
+// SaveUserCollection saves the user collection (as a JSON file) to disk
+func SaveUserCollection(path string, modified *Collection) error {
+	byteVal, err := json.Marshal(modified)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(path, byteVal, 0644)
+	return err
 }

@@ -55,7 +55,7 @@ function appendDir(dirId, dirName, dirLevel) {
  */
 function appendFile(fileId, fileName, fileLevel) {
     $("#div_directories").append("<a 'id'=" + makeFileId(fileId) + 
-    " href='javascript:void(0)' class='files' onClick='clickFile(" + fileId + ")'>" + levelIndention(fileLevel) + fileName + "</a><br>");
+    " href='javascript:void(0)' class='files' onClick='clickFile(\"" + fileId + "\")'>" + levelIndention(fileLevel) + fileName + "</a><br>");
 }
 
 /**
@@ -116,13 +116,13 @@ function displayFile(data) {
 
 /**
  * asks the backend for the file object
- * @param {number} fid the file id
+ * @param {string} fid the file id
  */
 function clickFile(fid) {
     $.ajax({
         type: "POST",
         url: urlDefaultView,
-        data: JSON.stringify({"user": defaultUserId, "fid": fid.toString()}),
+        data: JSON.stringify({"user": defaultUserId, "fid": fid}),
         success: function(data) {
             displayFile(data);
         },

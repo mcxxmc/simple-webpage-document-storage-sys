@@ -2,6 +2,7 @@ package manager
 
 import (
 	"simple-webpage-document-storage-sys/filesys"
+	"simple-webpage-document-storage-sys/logging"
 )
 
 var defaultManager *Manager
@@ -93,6 +94,17 @@ func prepareCache(path string) {
 func StartManager(path string) {
 	prepareCache(path)
 	defaultManager = &Manager{Collections: make(map[string]*filesys.Collection)}
+}
+
+
+
+
+// TODO: use flags to mark user collection as modified / not modified
+
+// SaveUserCollection saves the user collection (as a JSON file) to disk
+func SaveUserCollection(userId string) {
+	err := filesys.SaveUserCollection((*cached)[userId].Profile, defaultManager.userCollection(userId))
+	logging.ConditionalLogError(err, logging.S(s1userId, userId))
 }
 
 
