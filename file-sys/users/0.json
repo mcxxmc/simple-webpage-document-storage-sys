@@ -1,1 +1,74 @@
-{"1001":{"id":"1001","dir":true,"name":"default dir 1","level":1,"children":["2001","2002"],"parent":"ROOT"},"1002":{"id":"1002","dir":true,"name":"default dir 2","level":1,"children":["dir2"],"parent":"ROOT"},"2001":{"id":"2001","dir":false,"name":"default txt 1","level":2,"children":["D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/txt/0/0.txt"],"parent":"0"},"2002":{"id":"2002","dir":false,"name":"default txt 2","level":2,"children":["D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/txt/0/1.txt"],"parent":"0"},"ROOT":{"id":"ROOT","dir":true,"name":"ROOT","level":0,"children":["1001","1002"],"parent":"NONE"},"dir2":{"id":"dir2","dir":true,"name":"TestDir3","level":2,"children":["file2"],"parent":"1002"},"file2":{"id":"file2","dir":false,"name":"TestFile3","level":3,"children":["D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/txt/0/TestFile3"],"parent":"dir2"}}
+{
+    "1001": {
+        "id": "1001",
+        "dir": true,
+        "name": "default dir 1",
+        "level": 1,
+        "children": [
+            "2001",
+            "2002"
+        ],
+        "parent": "ROOT"
+    },
+    "1002": {
+        "id": "1002",
+        "dir": true,
+        "name": "default dir 2",
+        "level": 1,
+        "children": [
+            "dir2"
+        ],
+        "parent": "ROOT"
+    },
+    "2001": {
+        "id": "2001",
+        "dir": false,
+        "name": "default txt 1",
+        "level": 2,
+        "children": [
+            "D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/txt/0/0.txt"
+        ],
+        "parent": "0"
+    },
+    "2002": {
+        "id": "2002",
+        "dir": false,
+        "name": "default txt 2",
+        "level": 2,
+        "children": [
+            "D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/txt/0/1.txt"
+        ],
+        "parent": "0"
+    },
+    "ROOT": {
+        "id": "ROOT",
+        "dir": true,
+        "name": "ROOT",
+        "level": 0,
+        "children": [
+            "1001",
+            "1002"
+        ],
+        "parent": "NONE"
+    },
+    "dir2": {
+        "id": "dir2",
+        "dir": true,
+        "name": "TestDir3",
+        "level": 2,
+        "children": [
+            "file2"
+        ],
+        "parent": "1002"
+    },
+    "file2": {
+        "id": "file2",
+        "dir": false,
+        "name": "TestFile3",
+        "level": 3,
+        "children": [
+            "D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/txt/0/TestFile3"
+        ],
+        "parent": "dir2"
+    }
+}

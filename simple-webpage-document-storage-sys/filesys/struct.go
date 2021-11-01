@@ -4,7 +4,7 @@ package filesys
 type UserInfo struct {
 	Name string `json:"name"`
 	Uid string `json:"uid"`
-	Profile string `json:"profile"`
+	Profile string `json:"profile"`  // the path where the user profile is stored
 }
 
 // IndexesOfUsers maintains the basic info or all users;
