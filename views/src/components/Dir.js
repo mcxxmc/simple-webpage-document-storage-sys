@@ -1,8 +1,7 @@
 import React from "react";
+import {tab} from "../constants/constants";
 
-const tab = "  "
-
-class DirComponent extends React.Component {
+class Dir extends React.Component {
 
     render() {
         return (
@@ -16,4 +15,4 @@ class DirComponent extends React.Component {
 
 }
 
-export default DirComponent
+export default Dir

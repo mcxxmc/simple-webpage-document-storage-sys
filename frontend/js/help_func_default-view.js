@@ -1,4 +1,5 @@
 const urlDefaultView = "http://localhost:8080/default-view"
+const urlDefaultViewRead = "http://localhost:8080/default-view-read"
 const dirIdPrefix = "dir_"
 const fileIdPrefix = "file_"
 const tab ="&nbsp&nbsp&nbsp&nbsp"
@@ -121,7 +122,7 @@ function displayFile(data) {
 function clickFile(fid) {
     $.ajax({
         type: "POST",
-        url: urlDefaultView,
+        url: urlDefaultViewRead,
         data: JSON.stringify({"user": defaultUserId, "fid": fid}),
         success: function(data) {
             displayFile(data);

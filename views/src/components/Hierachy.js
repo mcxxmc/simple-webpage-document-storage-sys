@@ -1,26 +1,27 @@
 import React from "react";
-import DirComponent from "./DirComponent"
-import FileComponent from "./FileComponent";
+import Dir from "./Dir"
+import File from "./File";
 
 class Hierarchy extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            version: 0
+            organized: []
         }
-        this.organizedData = []
+        this.cache = []
     }
 
     componentDidMount() {
         this.recursivelyAppend(this.props.dirs, this.props.root, 0)
-        this.setState({version: this.state.version + 1})
+        this.setState({organized: this.cache})
+        this.cache = []
     }
 
     render() {
         return (
             <div>
-                {this.organizedData}
+                {this.state.organized}
             </div>
         )
     }
@@ -40,14 +41,20 @@ class Hierarchy extends React.Component {
             let dir = dirs[cur];
             if (dir["dir"] === true) {
                 let children = dir["children"];
-                this.organizedData.push(<DirComponent id={dir["id"]} name={dir["name"]} level={dir["level"]}/>)
+                this.cache.push(
+                    <Dir id={dir["id"]} name={dir["name"]} level={dir["level"]} userId={this.props.userId}
+                         key={"key" + dir["id"]}/>
+                )
                 if (children.length > 0) {  // append its children
                     for (let i = 0; i < children.length; i ++) {
                         this.recursivelyAppend(dirs, children[i], dep + 1);
                     }
                 }
             } else {
-                this.organizedData.push(<FileComponent id={dir["id"]} name={dir["name"]} level={dir["level"]}/>)
+                this.cache.push(
+                    <File id={dir["id"]} name={dir["name"]} level={dir["level"]} userId={this.props.userId}
+                          key={"key" + dir["id"]}/>
+                )
             }
         } catch(error) {
             console.error(error);

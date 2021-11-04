@@ -1,8 +1,6 @@
 import React from "react";
 import Hierarchy from "./Hierachy";
-
-const urlDefaultView = "http://localhost:8080/default-view"
-const defaultUserId = "0"
+import {defaultUserId, user2url} from "../constants/constants";
 
 class DefaultView extends React.Component {
 
@@ -17,7 +15,9 @@ class DefaultView extends React.Component {
 
     componentDidMount() {
         /* fetch data from the backend */
-        fetch(urlDefaultView)
+        const url = user2url["get"][defaultUserId]
+        console.log(url)
+        fetch(url)
             .then(response => response.json())
             .catch(error => console.error("Error: ", error))
             .then(response => this.setState({dirs: response["dirs"], root: response["top"], fetched: true}))
@@ -28,7 +28,7 @@ class DefaultView extends React.Component {
             case true:
                 return (
                     <div>
-                        <Hierarchy dirs={this.state.dirs} root={this.state.root}/>
+                        <Hierarchy dirs={this.state.dirs} root={this.state.root} userId={defaultUserId}/>
                     </div>
                 );
             default:
