@@ -1,5 +1,5 @@
-const urlDefaultView = "http://localhost:8080/default-view"
-const urlDefaultViewRead = "http://localhost:8080/default-view-read"
+const urlDefaultView = "http://localhost:8080/default-view/view"
+const urlDefaultViewRead = "http://localhost:8080/filesystem/read"
 const dirIdPrefix = "dir_"
 const fileIdPrefix = "file_"
 const tab ="&nbsp&nbsp&nbsp&nbsp"

@@ -19,9 +19,20 @@ func addMiddleware(router *gin.Engine) {
 }
 
 func bindUrl(router *gin.Engine) {
-	router.GET("/default-view", controller.DefaultViewSkeleton)
+	router.GET("/default-view/view", controller.DefaultViewSkeleton)
 
-	router.POST("/default-view-read", controller.GetFile)
+	// url for fetching file content
+	router.POST("/filesystem/read", controller.GetFile)
+	// url for modifying file content
+	router.POST("/filesystem/rewrite", controller.ModifyFile)
+	// url for renaming file && dir
+	router.POST("/filesystem/rename", controller.Rename)
+	// url for creating a new file || a new dir
+	router.POST("/filesystem/create", controller.Create)
+	// url for deleting a file || a dir
+	router.POST("/filesystem/remove", controller.Delete)
+	// url for moving a file || dir
+	router.POST("/filesystem/move", controller.Move)
 }
 
 func createServer(addr string, handler http.Handler) *http.Server {

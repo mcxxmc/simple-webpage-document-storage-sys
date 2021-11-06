@@ -28,7 +28,7 @@ class Hierarchy extends React.Component {
      */
     fetchFile(i) {
         const dir = this.state.organized[i];
-        fetch(user2url["post"]["readFile"][this.state.user], {  //TODO user
+        fetch(user2url["post"]["readFile"], {
             body: JSON.stringify({"user": this.state.user, "fid": dir["id"]}),
             method: 'POST'
         })
