@@ -1,0 +1,27 @@
+.file-vis-textarea {
+    height: 200px;
+    width: 500px;
+    border: 2px solid lime;
+    background-color: lightgreen;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.file-vis-textarea-rename {
+    height: 12px;
+    width: 500px;
+    border: 2px dashed crimson;
+    background-color: antiquewhite;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.file-vis-h1 {
+    text-align: center;
+}
+
+.file-vis-p {
+    text-align: center;
+}
