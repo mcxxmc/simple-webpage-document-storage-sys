@@ -3,7 +3,9 @@ package controller
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"math/rand"
 	"net/http"
+	"simple-webpage-document-storage-sys/common"
 	"simple-webpage-document-storage-sys/logging"
 	"simple-webpage-document-storage-sys/manager"
 	"strconv"
@@ -55,22 +57,32 @@ func Rename(c *gin.Context) {
 	}
 }
 
+func generateRandomId(n int) string {
+	id := make([]byte, n)
+	length := len(common.LetterBytes)
+	for i := range id {
+		id[i] = common.LetterBytes[rand.Intn(length)]
+	}
+	return string(id)
+}
+
 // Create deals with requests that create a new file or a new dir
 func Create(c *gin.Context) {
-	request := RequestCreate{}
+	request := &RequestCreate{}
 	err := c.BindJSON(request)
 	logging.ConditionalLogError(err)
 	b := false
+	objId := generateRandomId(64)
 	if request.Dir {
-		b = manager.CreateDir(request.User, request.ObjId, request.Name, request.ParentId)
+		b = manager.CreateDir(request.User, objId, request.Name, request.ParentId)
 	} else {
-		b = manager.CreateTxt(request.User, request.ObjId, request.Name, request.NewC, request.ParentId)
+		b = manager.CreateTxt(request.User, objId, request.Name, request.NewC, request.ParentId)
 	}
 	if b {
 		c.Status(http.StatusOK)  // TODO may need to send a new dirs
 	} else {
 		logging.Error(errors.New(errorCreating),
-			logging.SS{S1: s1UserId, S2: request.User}, logging.SS{S1: s1ObjId, S2: request.ObjId},
+			logging.SS{S1: s1UserId, S2: request.User}, logging.SS{S1: s1ObjId, S2: objId},
 			logging.SS{S1: s1IsDir, S2: strconv.FormatBool(request.Dir)}, logging.SS{S1: s1newName, S2: request.Name},
 			logging.SS{S1: s1NewC, S2: request.NewC}, logging.SS{S1: s1ParentId, S2: request.ParentId})
 		c.Status(http.StatusBadRequest)

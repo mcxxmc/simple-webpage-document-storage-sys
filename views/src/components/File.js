@@ -1,5 +1,4 @@
 import React from "react";
-import "./css/FD.css";
 import {tab} from "../constants/constants";
 
 class File extends React.Component {

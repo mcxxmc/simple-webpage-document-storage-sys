@@ -1,5 +1,7 @@
 package common
 
+const LetterBytes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
 // DefaultUserId the default user id for manager for testing
 const DefaultUserId = "0"
 

@@ -240,6 +240,7 @@ func (manager *Manager) rename(userId string, objectId string, newName string) b
 	}
 
 	img.Name = newName
+	// todo: if that is a file, considering updating its real filename and the path in img
 	return true
 }
 
