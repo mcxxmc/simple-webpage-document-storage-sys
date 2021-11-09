@@ -53,22 +53,28 @@ class FileVis extends React.Component {
                 <div>
                     <textarea value={this.state.newName} onChange={this.handleChangeRename}
                               className={"file-vis-textarea-rename"}/>
-                    <button onClick={() => this.rename()}>Confirm</button>
-                    <button onClick={() => this.setState({rename: false})}>Cancel</button>
+                    <button onClick={() => this.rename()}
+                            className={"basic-btn button-confirm"}>Confirm</button>
+                    <button onClick={() => this.setState({rename: false})}
+                            className={"basic-btn button-cancel"}>Cancel</button>
                 </div>
             )
         }
 
         return (
             <div>
-                <button onClick={() => this.quit()}>Quit</button>
+                <button onClick={() => this.quit()}
+                        className={"basic-btn button-cancel"}>Quit</button>
                 <h1 className={"file-vis-h1"}>{this.state.name}</h1>
-                <button onClick={() => this.setState({rename: true})}>Rename</button>
-                <button onClick={() => this.delete()}>Delete</button>
+                <button onClick={() => this.setState({rename: true})}
+                        className={"basic-btn button-rename"}>Rename</button>
+                <button onClick={() => this.delete()}
+                        className={"basic-btn button-delete"}>Delete</button>
                 {rename}
                 <br/>
                 <textarea value={this.state.content} onChange={this.handleChangeCtt} className={"file-vis-textarea"}/>
-                <button onClick={() => this.commit()}>Commit</button>
+                <button onClick={() => this.commit()}
+                        className={"basic-btn button-confirm"}>Commit</button>
             </div>
         )
     }

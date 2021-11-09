@@ -76,40 +76,45 @@ class Dir extends React.Component {
         let rename;
         if (this.state.rename) {
             rename = (
-                <div>
+                <div className={"div-dir-1 div-flex"}>
                     <textarea value={this.state.newName} onChange={this.handleChangeRename}
-                              className={"dir-textarea-rename"} />
-                    <button onClick={() => this.rename()}>Confirm</button>
-                    <button onClick={() => this.setState({rename: false})}>Cancel</button>
+                              className={"dir-textarea-1"} />
+                    <button onClick={() => this.rename()}
+                            className={"basic-btn button-confirm"}>Confirm</button>
+                    <button onClick={() => this.setState({rename: false})}
+                            className={"basic-btn button-cancel"}>Cancel</button>
                 </div>
             )
         }
         let create;
         if (this.state.create) {
             create = (
-                <div>
+                <div className={"div-dir-1 div-flex"}>
                     <select onChange={this.handleChangeCreateType}>
                         <option value={true}>Directory</option>
                         <option value={false}>txt file</option>
                     </select>
                     <textarea value={this.state.createName} onChange={this.handleChangeCreateName}
-                              className={"dir-textarea-create"}/>
-                    <button onClick={() => this.create()}>Confirm</button>
-                    <button onClick={() => this.setState({create: false, createName: "new", createDir: true})}>Cancel</button>
+                              className={"dir-textarea-1"}/>
+                    <button onClick={() => this.create()}
+                            className={"basic-btn button-confirm"}>Confirm</button>
+                    <button onClick={() => this.setState({create: false, createName: "new", createDir: true})}
+                            className={"basic-btn button-cancel"}>Cancel</button>
                 </div>
             )
         }
         return (
-            <div className={"div_dir"}>
-                <pre>
-                    <p>{tab.repeat(this.state.level) + this.state.name}</p>
-                </pre>
-                <button onClick={() => this.setState({rename: true, create: false})}
-                        className={"dir-button1"}>Rename</button>
-                <button onClick={() => this.setState({rename: false, create: true})}
-                        className={"dir-button1"}>New</button>
-                <button onClick={() => this.delete()}
-                        className={"dir-button1"}>delete</button>
+            <div className={"div-dir-2"}>
+                <div className={"div-flex"}>
+                    <input readOnly={true} className={"dir-input-readOnly"}
+                           value={tab.repeat(this.state.level) + this.state.name}/>
+                    <button onClick={() => this.setState({rename: true, create: false})}
+                            className={"basic-btn button-rename"}>Rename</button>
+                    <button onClick={() => this.setState({rename: false, create: true})}
+                            className={"basic-btn button-create"}>New</button>
+                    <button onClick={() => this.delete()}
+                            className={"basic-btn button-delete"}>delete</button>
+                </div>
                 {rename}
                 {create}
             </div>

@@ -3,6 +3,7 @@ import Dir from "./Dir"
 import File from "./File";
 import FileVis from "./FileVis";
 import {defaultUserId, user2url} from "../constants/constants";
+import "./css/hierachy.css"
 
 class Hierarchy extends React.Component {
 
@@ -258,7 +259,7 @@ class Hierarchy extends React.Component {
             tree = this.state.organized.map((x, i) => this.display(x, i));
         }
         return (
-            <div>
+            <div className={"div-hierarchy"}>
                 {tree}
                 {visFile}
             </div>

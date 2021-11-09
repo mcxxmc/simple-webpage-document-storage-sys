@@ -2,17 +2,6 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -24,17 +13,40 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.basic-btn {
+  width: 60px;
+  height: 20px;
+  align-content: center;
+  margin-right: 2px;
+  margin-left: 2px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.button-confirm {
+  background-color: aqua;
 }
 
+.button-cancel {
+  background-color: crimson;
+}
 
+.button-rename {
+  background-color: darkorange;
+}
+
+.button-create {
+  background-color: darkorange;
+}
+
+.button-delete {
+  background-color: crimson;
+}
+
+.div-centered {
+  text-align: center;
+}
+
+.div-flex {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}

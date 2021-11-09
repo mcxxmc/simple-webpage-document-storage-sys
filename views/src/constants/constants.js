@@ -1,4 +1,4 @@
-export const tab = "  "
+export const tab = "    "
 
 export const defaultUserId = "0"
 

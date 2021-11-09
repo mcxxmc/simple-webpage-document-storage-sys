@@ -1,0 +1,17 @@
+.dir-textarea-1 {
+    height: 12px;
+    width: 500px;
+    border: 2px dashed crimson;
+    background-color: antiquewhite;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.div-dir-1 {
+    margin-left: 20%;
+}
+
+.dir-input-readOnly {
+    border-color: transparent;
+    background-color: transparent;
+}
