@@ -9,6 +9,7 @@ import (
 	"simple-webpage-document-storage-sys/logging"
 	"simple-webpage-document-storage-sys/manager"
 	"strconv"
+	"time"
 )
 
 // GetFile deals with requests that ask for a specific file
@@ -60,6 +61,7 @@ func Rename(c *gin.Context) {
 func generateRandomId(n int) string {
 	id := make([]byte, n)
 	length := len(common.LetterBytes)
+	rand.Seed(time.Now().UnixNano())  // to avoid same random ids
 	for i := range id {
 		id[i] = common.LetterBytes[rand.Intn(length)]
 	}

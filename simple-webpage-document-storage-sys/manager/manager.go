@@ -39,6 +39,8 @@ func ModifyTxt(userId string, fileId string, newContent string) bool {
 }
 
 // CreateTxt creates a txt file with content
+//
+// note that the real new filename on disk equals to newFileId.txt instead of newFileName (to avoid collision)
 func CreateTxt(userId string, newFileId string, newFileName string, newContent string, parentId string) bool {
 	return defaultManager.createTxt(userId, newFileId, newFileName, newContent, parentId)
 }
@@ -93,18 +95,28 @@ func prepareCache(path string) {
 // must be called before any other function calls
 func StartManager(path string) {
 	prepareCache(path)
-	defaultManager = &Manager{Collections: make(map[string]*filesys.Collection)}
+	defaultManager = &Manager{Collections: make(map[string]*filesys.Collection), Modified: make(map[string]bool)}
 }
 
-
-
-
-// TODO: use flags to mark user collection as modified / not modified
-
 // SaveUserCollection saves the user collection (as a JSON file) to disk
+//
+// should avoid using this
+//TODO: deprecate this function and replace it in the test cases
 func SaveUserCollection(userId string) {
 	err := filesys.SaveUserCollection((*cached)[userId].Profile, defaultManager.userCollection(userId))
 	logging.ConditionalLogError(err, logging.S(s1userId, userId))
+}
+
+// SaveModifiedUserCollections saves all the modified user collections to disk
+//
+// should be called periodically or when the program shuts down.
+func SaveModifiedUserCollections() {
+	for uid, b := range defaultManager.Modified {
+		if b {
+			SaveUserCollection(uid)
+			defaultManager.Modified[uid] = false
+		}
+	}
 }
 
 

@@ -14,7 +14,6 @@ class Hierarchy extends React.Component {
             user: this.props.userId,
             fileOnDisplay: -1,  // the index of the file that is now displayed. -1 means none.
             fileOnDisplayId: "",  // the id of the file that is now displayed
-            indexesModified: false,  // if the indexes of the organized array is modified
             filename: "",  // the filename of the file that is now displayed
             content: "",  // the content of the file that is now displayed
         }
@@ -32,7 +31,6 @@ class Hierarchy extends React.Component {
             root: promise["top"],
             fileOnDisplay: -1,
             fileOnDisplayId: "",
-            indexesModified: false,
             filename: "",
             content: ""});
     }
@@ -69,6 +67,14 @@ class Hierarchy extends React.Component {
             .catch(error => console.error("Error: ", error))
             .then(response => this.setState({fileOnDisplay: i, fileOnDisplayId: dir["id"],
                 filename: response["file_name"], content: response["content"]}))
+    }
+
+    /**
+     * The callback function for stopping to display the file and return to the tree view.
+     * @param childData
+     */
+    callbackStopDisplayingFile = (childData) => {
+        this.setState({fileOnDisplay: -1});
     }
 
     /**
@@ -239,16 +245,21 @@ class Hierarchy extends React.Component {
 
     render() {
         let visFile;
-        if (this.state.fileOnDisplay !== -1 && !this.state.indexesModified) {
+        if (this.state.fileOnDisplay !== -1) {
             visFile = <FileVis filename={this.state.filename} content={this.state.content}
                                index={this.state.fileOnDisplay} id={this.state.fileOnDisplayId}
+                               callbackStopDisplayingFile={this.callbackStopDisplayingFile}
                                callbackModifyFile={this.callbackModifyFile}
                                callbackRename={this.callbackRename}
                                callbackDelete={this.callbackDelete}/>
         }
+        let tree;
+        if (this.state.fileOnDisplay === -1) {
+            tree = this.state.organized.map((x, i) => this.display(x, i));
+        }
         return (
             <div>
-                {this.state.organized.map((x, i) => this.display(x, i))}
+                {tree}
                 {visFile}
             </div>
         )

@@ -60,9 +60,6 @@ class Dir extends React.Component {
 
     create() {
         let name = this.state.createName.trim();
-        if (!this.state.createDir) {
-            name = name + ".txt"
-        }
         this.props.callbackCreate({"parentIndex": this.state.index, "parentId": this.state.id,
             "isDir": this.state.createDir, "name": name})
         this.setState({create: false, createName: "new", createDir: true})

@@ -71,6 +71,7 @@ func main() {
 
 	// start the manager which maintains the user info
 	manager.StartManager(common.Path_index_of_users)
+	defer manager.SaveModifiedUserCollections()
 
 	// config the router
 	router := gin.Default()

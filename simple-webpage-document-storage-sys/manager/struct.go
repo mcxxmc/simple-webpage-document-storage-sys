@@ -12,6 +12,13 @@ type Manager struct {
 	// user uid (not name): their images.
 	Collections map[string]*filesys.Collection
 
+	// user uid : bool
+	// keeps the uid of which the collection is modified
+	// (not including modifying a real txt file, which will not be reflected in the images)
+	// the bool will always be true unless the change has been made to disk
+	// unmodified collection will not cause its corresponding uid to be in this map
+	Modified map[string]bool
+
 	// Note that map, slice and channel is passed by pointer by golang, so there's no need for an additional '*'
 	// UserTimestamp map[string]"time"
 	//TODO: add a go routine timer to manager to remove some logged users that have been idle for long
@@ -76,6 +83,8 @@ func (manager *Manager) fetchTxt(userId string, fileId string) (string, string) 
 }
 
 // modifies a txt file
+//
+// note that this action won't mark the collection as modified
 func (manager *Manager) modifyTxt(userId string, fileId string, newContent string) bool {
 	collection := *manager.userCollection(userId)
 
@@ -99,6 +108,8 @@ func (manager *Manager) modifyTxt(userId string, fileId string, newContent strin
 }
 
 // creates a txt file with content
+//
+// note that the real new filename on disk equals to newFileId.txt instead of newFileName (to avoid collision)
 func (manager *Manager) createTxt(userId string, newFileId string, newFileName string,
 	newContent string, parentId string) bool {
 
@@ -129,7 +140,7 @@ func (manager *Manager) createTxt(userId string, newFileId string, newFileName s
 	}
 
 	// create a new Image
-	newPath := common.NewTxtPath(newFileName, userId)
+	newPath := common.NewTxtPath(newFileId + ".txt", userId)  // alter the file name here
 	level := parent.Level + 1
 	newImg := &filesys.Image{ID: newFileId, Dir: false, Name: newFileName, Level: level,
 		Children: []string{newPath}, Parent: parentId}
@@ -139,6 +150,8 @@ func (manager *Manager) createTxt(userId string, newFileId string, newFileName s
 
 	// append the new txt as a child to its parent
 	collection[parentId].Children = append(collection[parentId].Children, newFileId)
+
+	manager.Modified[userId] = true
 
 	return filesys.RewriteTxt(newPath, newContent)
 }
@@ -173,6 +186,7 @@ func (manager *Manager) deleteTxt(userId string, fileId string) bool {
 	if ok == true {
 		oldParent.Children = removeString(oldParent.Children, fileId)
 		delete(collection, fileId)
+		manager.Modified[userId] = true
 		return true
 	} else {
 		return false
@@ -221,6 +235,8 @@ func (manager *Manager) move(userId string, objectId string, newParentId string)
 	img.Level = newParent.Level + 1
 	newParent.Children = append(newParent.Children, objectId)
 
+	manager.Modified[userId] = true
+
 	return true
 }
 
@@ -241,6 +257,9 @@ func (manager *Manager) rename(userId string, objectId string, newName string) b
 
 	img.Name = newName
 	// todo: if that is a file, considering updating its real filename and the path in img
+
+	manager.Modified[userId] = true
+
 	return true
 }
 
@@ -283,6 +302,8 @@ func (manager *Manager) createDir(userId string, newDirId string, newDirName str
 	// append the new txt as a child to its parent
 	collection[parentId].Children = append(collection[parentId].Children, newDirId)
 
+	manager.Modified[userId] = true
+
 	return true
 }
 
@@ -320,5 +341,8 @@ func (manager *Manager) deleteDir(userId string, dirId string) bool {
 
 	oldParent.Children = removeString(oldParent.Children, dirId)
 	delete(collection, dirId)
+
+	manager.Modified[userId] = true
+
 	return true
 }

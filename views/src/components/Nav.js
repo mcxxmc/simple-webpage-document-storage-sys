@@ -7,6 +7,7 @@ class Nav extends React.Component {
     render() {
         return (
             <div>
+                <h1>Nav</h1>
                 <button onClick = {initializeDefaultView}>DefaultView</button>
             </div>
         )
@@ -16,7 +17,7 @@ class Nav extends React.Component {
 function initializeDefaultView() {
     ReactDOM.render(
         <DefaultView/>,
-        document.getElementById("div_content")
+        document.getElementById("root")
     )
 }
 
