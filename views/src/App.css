@@ -21,6 +21,14 @@
   margin-left: 2px;
 }
 
+.small-basic-btn {
+  width: 45px;
+  height: 20px;
+  align-content: center;
+  margin-right: 2px;
+  margin-left: 2px;
+}
+
 .button-confirm {
   background-color: aqua;
 }
@@ -41,6 +49,14 @@
   background-color: crimson;
 }
 
+.button-mark {
+  background-color: lime;
+}
+
+.button-move {
+  background-color: gold;
+}
+
 .div-centered {
   text-align: center;
 }
@@ -49,4 +65,9 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
+}
+
+.input-readOnly {
+  border-color: transparent;
+  background-color: transparent;
 }

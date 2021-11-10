@@ -5,6 +5,7 @@ import (
 	"simple-webpage-document-storage-sys/common"
 	"simple-webpage-document-storage-sys/filesys"
 	"simple-webpage-document-storage-sys/logging"
+	"time"
 )
 
 // Manager manages the collections of all users;
@@ -37,8 +38,9 @@ func (manager *Manager) registerUser(userId string) {
 	}
 	if userInfo, ok := (*cached)[userId]; ok {
 		manager.Collections[userId] = filesys.LoadUserDirs(userInfo.Profile)
+		logging.Info("user logs in", logging.S(s1userId, userId), logging.S(s1time, time.Now().Format(time.UnixDate)))
 	} else {
-
+		logging.Error(errors.New(errorUserInvalid), logging.S(s1userId, userId))
 	}
 }
 
@@ -46,6 +48,7 @@ func (manager *Manager) registerUser(userId string) {
 func (manager *Manager) unregisterUser(userId string) {
 	if _, ok := manager.Collections[userId]; ok {
 		delete(manager.Collections, userId)
+		logging.Info("user logs out", logging.S(s1userId, userId), logging.S(s1time, time.Now().Format(time.UnixDate)))
 	} else {
 		logging.Error(errors.New(errorUserNotLoggedIn), logging.S(s1userId, userId))
 	}

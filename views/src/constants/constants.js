@@ -1,6 +1,7 @@
 export const tab = "    "
 
 export const defaultUserId = "0"
+export const defaultUserName = "default"
 
 export const user2url = {
     "get": {

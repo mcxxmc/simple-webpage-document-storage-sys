@@ -5,6 +5,7 @@ const errorRenaming = "failed to rename"
 const errorCreating = "failed to create"
 const errorDeleting = "failed to delete"
 const errorMoving = "failed to move"
+const errorInvalidToken = "invalid token"
 
 const s1UserId = "user id"
 const s1FileId = "file id"

@@ -17,6 +17,7 @@ const errorFileIdNotExist = "the file id does not exist"
 const errorDirIdNotExist = "the directory id does not exist"
 
 const errorUserAlreadyLoggedIn = "the user has already logged in"
+const errorUserInvalid = "the user does not exist"
 const errorUserNotLoggedIn = "the user has not logged in"
 
 const errorDirNotEmpty = "the directory is not empty"
@@ -26,3 +27,4 @@ const s1fileId = "file id: "
 const s1dirId = "directory id: "
 const s1objectId = "file or directory id: "
 const s1parentId = "parent id: "
+const s1time = "timestamp: "

@@ -2,6 +2,8 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"simple-webpage-document-storage-sys/common"
+	"simple-webpage-document-storage-sys/token"
 )
 
 // SetHeader sets the http header and:
@@ -17,6 +19,19 @@ func SetHeader() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
 		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Next()
+	}
+}
+
+// DecodeToken decodes the token and put the extracted uid into the context
+func DecodeToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tokenStr := c.Request.Header.Get("Authorization")
+		uid, b := token.DecodeToken(tokenStr)
+
+		if b {
+			c.Set(common.TokenUid, uid)
+		}
 		c.Next()
 	}
 }

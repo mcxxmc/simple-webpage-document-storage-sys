@@ -6,7 +6,7 @@ import (
 )
 
 var defaultManager *Manager
-var cached *filesys.IndexesOfUsers  //TODO: replace this with MySQL
+var cached *filesys.IndexesOfUsers  // TODO: replace this with MySQL
 
 // NumberOfUsers returns the number of users logged in
 func NumberOfUsers() int {
@@ -117,6 +117,23 @@ func SaveModifiedUserCollections() {
 			defaultManager.Modified[uid] = false
 		}
 	}
+}
+
+// VerifyUserPassword verifies the username - password pair and returns the userId and a bool
+//
+// the bool will be false if the userId does not exist or the pair is invalid
+//
+// TODO: change to SQL; detailed return (if the username does not exist)
+func VerifyUserPassword(username, password string) (string, bool) {
+	for _, user := range *cached {
+		if user.Name == username {
+			if user.Password == password {
+				return user.Uid, true
+			}
+			return "", false
+		}
+	}
+	return "", false
 }
 
 

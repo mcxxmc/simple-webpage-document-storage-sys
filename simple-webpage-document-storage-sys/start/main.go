@@ -16,6 +16,7 @@ import (
 
 func addMiddleware(router *gin.Engine) {
 	router.Use(controller.SetHeader())
+	router.Use(controller.DecodeToken())
 }
 
 func bindUrl(router *gin.Engine) {

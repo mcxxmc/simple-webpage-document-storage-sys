@@ -69,6 +69,14 @@ class Dir extends React.Component {
         this.props.callbackDelete({"name": this.state.name, "objId": this.state.id, "isDir": true, "index": this.state.index})
     }
 
+    mark() {
+        this.props.callbackMark({"index": this.state.index, "id": this.state.id})
+    }
+
+    move() {
+        this.props.callbackMove({"objId": this.state.id, "isDir": true, "index": this.state.index})
+    }
+
     render() {
         if (!this.state.show) {
             return
@@ -106,8 +114,12 @@ class Dir extends React.Component {
         return (
             <div className={"div-dir-2"}>
                 <div className={"div-flex"}>
-                    <input readOnly={true} className={"dir-input-readOnly"}
+                    <input readOnly={true} className={"input-readOnly"} style={this.props.style}
                            value={tab.repeat(this.state.level) + this.state.name}/>
+                    <button className={"small-basic-btn button-mark"}
+                            onClick={() => this.mark()}>Mark</button>
+                    <button className={"small-basic-btn button-move"}
+                            onClick={() => this.move()}>Move</button>
                     <button onClick={() => this.setState({rename: true, create: false})}
                             className={"basic-btn button-rename"}>Rename</button>
                     <button onClick={() => this.setState({rename: false, create: true})}

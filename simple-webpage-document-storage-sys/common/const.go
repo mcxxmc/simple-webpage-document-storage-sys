@@ -16,3 +16,6 @@ const RootParentId = "None"
 
 // Port the port number on which Gin is running
 const Port = ":8080"
+
+// TokenUid the key string for c.Get and c.Set
+const TokenUid = "uid"

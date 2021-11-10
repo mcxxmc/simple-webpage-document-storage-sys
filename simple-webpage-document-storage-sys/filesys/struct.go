@@ -4,10 +4,11 @@ package filesys
 type UserInfo struct {
 	Name string `json:"name"`
 	Uid string `json:"uid"`
+	Password string `json:"password"`
 	Profile string `json:"profile"`  // the path where the user profile is stored
 }
 
-// IndexesOfUsers maintains the basic info or all users;
+// IndexesOfUsers maintains the basic info of all users;
 //
 // map structure = uid : *UserInfo
 type IndexesOfUsers map[string]*UserInfo
@@ -28,3 +29,14 @@ type Image struct {
 //
 // map structure = Image id : *Image
 type Collection map[string]*Image // passed by pointer
+
+type Profile struct {
+	ROOT struct {
+		Id       string        `json:"id"`
+		Dir      bool          `json:"dir"`
+		Name     string        `json:"name"`
+		Level    int           `json:"level"`
+		Children []string      `json:"children"`
+		Parent   string        `json:"parent"`
+	} `json:"ROOT"`
+}

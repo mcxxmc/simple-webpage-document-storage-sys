@@ -17,6 +17,8 @@ class Hierarchy extends React.Component {
             fileOnDisplayId: "",  // the id of the file that is now displayed
             filename: "",  // the filename of the file that is now displayed
             content: "",  // the content of the file that is now displayed
+            markedIndex: -1,  // the index of the marked dir
+            markedId: "",  // the id of the marked dir; used to check if the markedIndex is valid
         }
         this.cache = []
     }
@@ -33,7 +35,10 @@ class Hierarchy extends React.Component {
             fileOnDisplay: -1,
             fileOnDisplayId: "",
             filename: "",
-            content: ""});
+            content: "",
+            markedIndex: -1,
+            markedId: "",
+        });
     }
 
     /**
@@ -227,6 +232,70 @@ class Hierarchy extends React.Component {
     }
 
     /**
+     * The callback function for marking a dir as the potential new parent node.
+     * @param childData
+     */
+    callbackMark = (childData) => {
+        let index = childData["index"];
+        let id = childData["id"];
+        if (this.state.organized[index]["id"] !== id) {
+            console.error("Error when marking: index and id does not match")
+            alert("error")
+            return
+        }
+        if (this.state.markedIndex === index && this.state.markedId === id) {
+            console.log("the directory is already marked. It is now unmarked.")
+            this.setState({markedIndex: -1, markedId: ""})
+            return
+        }
+        this.setState({markedIndex: index, markedId: id})
+    }
+
+    /**
+     * The callback function for moving a dir or a file.
+     * @param childData
+     */
+    callbackMove = (childData) => {
+        if (this.state.markedIndex === -1 || this.state.markedId === "") {
+            alert("No parent node selected yet.")
+            return
+        }
+        let user = this.state.user;
+        let objId = childData["objId"];
+        let isDir = childData["isDir"];
+        let index = childData["index"];
+        if (this.state.organized[this.state.markedIndex]["id"] !== this.state.markedId) {
+            console.error("Error when marking: index and id do not match")
+            alert("error")
+            return
+        }
+        if (this.state.organized[index]["id"] !== objId || this.state.organized[index]["dir"] !== isDir) {
+            console.error("Error when Moving: child index and id do not match, or the types do not match")
+            alert("error")
+            return
+        }
+        let type;
+        if (isDir) {
+            type = " directory "
+        } else {
+            type = " file "
+        }
+        let msg = "are you sure you want to move" + type + this.state.organized[index]["name"] + "?";
+        if (window.confirm(msg)) {
+            fetch(user2url["post"]["move"], {
+                body: JSON.stringify({
+                    "user": user,
+                    "obj_id": objId,
+                    "dir": isDir,
+                    "new_parent_id": this.state.markedId
+                }),
+                method: 'POST'
+            }).catch(error => alert("Error moving"))
+                .then(() => this.fetchAndSort())  //todo: change to a cheaper way
+        }
+    }
+
+    /**
      * used for the render() method
      * @param {JSON} x
      * @param {int} i
@@ -235,16 +304,26 @@ class Hierarchy extends React.Component {
         if (x["dir"] === true) {
             return <Dir id={x["id"]} name={x["name"]} level={x["level"]} index={i}
                         key={i}
+                        style={{backgroundColor:
+                                this.state.markedIndex === i && this.state.markedId === x["id"]? "red": "transparent"}}
                         callbackRename={this.callbackRename}
                         callbackCreate={this.callbackCreate}
-                        callbackDelete={this.callbackDelete}/>
+                        callbackDelete={this.callbackDelete}
+                        callbackMark={this.callbackMark}
+                        callbackMove={this.callbackMove}/>
         } else {
             return <File id={x["id"]} name={x["name"]} level={x["level"]} index={i}
-                         key={i} onClick={() => this.fetchFile(i)}/>
+                         key={i} onClick={() => this.fetchFile(i)}
+                         callbackMove={this.callbackMove}/>
         }
     }
 
     render() {
+        const welcome = (
+            <div>
+                <h1 className={"hierarchy-h1"}>{"Welcome user: " + this.state.user}</h1>
+            </div>
+        );
         let visFile;
         if (this.state.fileOnDisplay !== -1) {
             visFile = <FileVis filename={this.state.filename} content={this.state.content}
@@ -260,6 +339,7 @@ class Hierarchy extends React.Component {
         }
         return (
             <div className={"div-hierarchy"}>
+                {welcome}
                 {tree}
                 {visFile}
             </div>
