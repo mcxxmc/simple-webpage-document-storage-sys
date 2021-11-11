@@ -1,13 +1,10 @@
 import './App.css';
+import Hierarchy from "./components/Hierachy";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Click on the nav bar to continue.
-        </p>
-      </header>
+    <div>
+      <Hierarchy/>
     </div>
   );
 }

@@ -1,11 +1,10 @@
 export const tab = "    "
-
-export const defaultUserId = "0"
-export const defaultUserName = "default"
+export const bearer = "Bearer "
 
 export const user2url = {
     "get": {
-        "0": "http://localhost:8080/default-view/view"
+        "view": "http://localhost:8080/filesystem/view",
+        "logout": "http://localhost:8080/filesystem/logout"
     },
     "post": {
         "readFile": "http://localhost:8080/filesystem/read",
@@ -13,6 +12,7 @@ export const user2url = {
         "rename": "http://localhost:8080/filesystem/rename",
         "create": "http://localhost:8080/filesystem/create",
         "delete": "http://localhost:8080/filesystem/remove",
-        "move": "http://localhost:8080/filesystem/move"
+        "move": "http://localhost:8080/filesystem/move",
+        "login": "http://localhost:8080/filesystem/login",
     }
 }

@@ -57,6 +57,16 @@ func SaveUserCollection(path string, modified *Collection) error {
 	return err
 }
 
+// SaveIndexesOfUsers saves the indexes of users to the disk
+func SaveIndexesOfUsers(path string, indexes *IndexesOfUsers) error {
+	byteVal, err := json.Marshal(indexes)
+	if err != nil {
+		return nil
+	}
+	err = ioutil.WriteFile(path, byteVal, 0644)
+	return err
+}
+
 // CreateNewUserProfile creates a new profile and save it to disk
 func CreateNewUserProfile(path string) error {
 	newProfile := &Profile{

@@ -64,13 +64,14 @@ func (manager *Manager) userCollection(userId string) *filesys.Collection {
 
 // returns the txt file (name and content) by its id of and the user that owns it
 func (manager *Manager) fetchTxt(userId string, fileId string) (string, string) {
-	collection := *manager.userCollection(userId)
+	p := manager.userCollection(userId)
 
-	if collection == nil {
+	if p == nil {
 		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
 		return "", ""
 	}
 
+	collection := *p
 	img, exist := collection[fileId]
 	if exist == false {
 		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1userId, userId), logging.S(s1fileId, fileId))
@@ -89,13 +90,14 @@ func (manager *Manager) fetchTxt(userId string, fileId string) (string, string) 
 //
 // note that this action won't mark the collection as modified
 func (manager *Manager) modifyTxt(userId string, fileId string, newContent string) bool {
-	collection := *manager.userCollection(userId)
+	p := manager.userCollection(userId)
 
-	if collection == nil {
+	if p == nil {
 		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
 		return false
 	}
 
+	collection := *p
 	img, exist := collection[fileId]
 	if exist == false {
 		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1userId, userId), logging.S(s1fileId, fileId))
@@ -121,13 +123,15 @@ func (manager *Manager) createTxt(userId string, newFileId string, newFileName s
 		return false
 	}
 
-	collection := *manager.userCollection(userId)
+	p := manager.userCollection(userId)
 
 	// check if the user id is valid
-	if collection == nil {
+	if p == nil {
 		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
 		return false
 	}
+
+	collection := *p
 
 	// check if the newFileId is valid
 	if _, exist := collection[newFileId]; exist == true {
@@ -161,13 +165,14 @@ func (manager *Manager) createTxt(userId string, newFileId string, newFileName s
 
 // deletes a txt file
 func (manager *Manager) deleteTxt(userId string, fileId string) bool {
-	collection := *manager.userCollection(userId)
+	p := manager.userCollection(userId)
 
-	if collection == nil {
+	if p == nil {
 		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
 		return false
 	}
 
+	collection := *p
 	img, exist := collection[fileId]
 	if exist == false {
 		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1userId, userId), logging.S(s1fileId, fileId))
@@ -200,12 +205,15 @@ func (manager *Manager) deleteTxt(userId string, fileId string) bool {
 //
 // it does not move the real files on the disk due to the special design of this project
 func (manager *Manager) move(userId string, objectId string, newParentId string) bool {
-	collection := *manager.userCollection(userId)
+	//todo update the level of children!!
+	p := manager.userCollection(userId)
 
-	if collection == nil {
+	if p == nil {
 		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
 		return false
 	}
+
+	collection := *p
 
 	newParent, exist := collection[newParentId]
 
@@ -245,13 +253,14 @@ func (manager *Manager) move(userId string, objectId string, newParentId string)
 
 // renames a file or a directory
 func (manager *Manager) rename(userId string, objectId string, newName string) bool {
-	collection := *manager.userCollection(userId)
+	p := manager.userCollection(userId)
 
-	if collection == nil {
+	if p == nil {
 		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
 		return false
 	}
 
+	collection := *p
 	img, exist := collection[objectId]
 	if exist == false {
 		logging.Error(errors.New(errorFileIdNotExist), logging.S(s1userId, userId), logging.S(s1objectId, objectId))
@@ -273,13 +282,15 @@ func (manager *Manager) createDir(userId string, newDirId string, newDirName str
 		return false
 	}
 
-	collection := *manager.userCollection(userId)
+	p := manager.userCollection(userId)
 
 	// check if the user id is valid
-	if collection == nil {
+	if p == nil {
 		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
 		return false
 	}
+
+	collection := *p
 
 	// check if the newDirId is valid
 	if _, exist := collection[newDirId]; exist == true {
@@ -312,14 +323,15 @@ func (manager *Manager) createDir(userId string, newDirId string, newDirName str
 
 // deletes a directory (only works when the directory is empty)
 func (manager *Manager) deleteDir(userId string, dirId string) bool {
-	collection := *manager.userCollection(userId)
+	p := manager.userCollection(userId)
 
 	// check if the user id is valid
-	if collection == nil {
+	if p == nil {
 		logging.Error(errors.New(errorCollectionNotFound), logging.S(s1userId, userId))
 		return false
 	}
 
+	collection := *p
 	img, exist := collection[dirId]
 	if exist == false {
 		logging.Error(errors.New(errorDirIdNotExist), logging.S(s1userId, userId), logging.S(s1dirId, dirId))

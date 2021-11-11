@@ -1,4 +1,1 @@
-{
-    "0": {"name": "default", "uid": "0", "password": "", "profile": "D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/users/0.json"},
-    "a1bg1": {"name": "user1", "uid": "a1bg1", "password": "user1", "profile": "D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/users/a1bg1.json"}
-}
+{"0":{"name":"default","uid":"0","password":"","profile":"D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/users/0.json"},"a1bg1":{"name":"user1","uid":"a1bg1","password":"user1","profile":"D:/ProgrammingTestsGo/simple-webpage-document-storage-sys/file-sys/users/a1bg1.json"}}

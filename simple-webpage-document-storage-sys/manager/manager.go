@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"simple-webpage-document-storage-sys/common"
 	"simple-webpage-document-storage-sys/filesys"
 	"simple-webpage-document-storage-sys/logging"
 )
@@ -117,6 +118,20 @@ func SaveModifiedUserCollections() {
 			defaultManager.Modified[uid] = false
 		}
 	}
+}
+
+// SaveIndexesOfUsers saves the indexes of users to the disk
+//
+// should be called periodically or when the program shuts down.
+func SaveIndexesOfUsers() {
+	err := filesys.SaveIndexesOfUsers(common.Path_index_of_users, cached)
+	logging.ConditionalLogError(err)
+}
+
+// SaveWhenShuttingDown saves necessary info to disk when shutting down
+func SaveWhenShuttingDown() {
+	SaveModifiedUserCollections()
+	SaveIndexesOfUsers()
 }
 
 // VerifyUserPassword verifies the username - password pair and returns the userId and a bool

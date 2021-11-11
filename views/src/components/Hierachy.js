@@ -2,7 +2,8 @@ import React from "react";
 import Dir from "./Dir"
 import File from "./File";
 import FileVis from "./FileVis";
-import {defaultUserId, user2url} from "../constants/constants";
+import Login from "./Login"
+import {user2url} from "../constants/constants";
 import "./css/hierachy.css"
 
 class Hierarchy extends React.Component {
@@ -12,22 +13,26 @@ class Hierarchy extends React.Component {
         this.state = {
             organized: [],
             root: "",
-            user: this.props.userId,
             fileOnDisplay: -1,  // the index of the file that is now displayed. -1 means none.
             fileOnDisplayId: "",  // the id of the file that is now displayed
             filename: "",  // the filename of the file that is now displayed
             content: "",  // the content of the file that is now displayed
             markedIndex: -1,  // the index of the marked dir
             markedId: "",  // the id of the marked dir; used to check if the markedIndex is valid
+            login: false,  // whether the user has logged in
         }
         this.cache = []
     }
 
     /**
-     * sort the data from the promise and update the state (the user id won't change)
+     * sort the data from the promise and update the state
      * @param {Promise} promise
      */
     sort(promise) {
+        if (!promise["ok"]) {
+            console.error("unsuccessful transaction")
+            return
+        }
         this.recursivelyAppend(promise["dirs"], promise["top"], 0);
         this.setState({
             organized: this.cache,
@@ -47,16 +52,15 @@ class Hierarchy extends React.Component {
      */
     fetchAndSort() {
         /* fetch data from the backend */
-        const url = user2url["get"][defaultUserId]
-        fetch(url)
+        fetch(user2url["get"]["view"], {
+            headers: {
+                "Authorization": window.localStorage.getItem("token")
+            }
+        })
             .then(response => response.json())
             .catch(error => console.error("Error: ", error))
             .then(response => this.sort(response))
         this.cache = []  // empty the cache
-    }
-
-    componentDidMount() {
-        this.fetchAndSort()
     }
 
     /**
@@ -66,7 +70,10 @@ class Hierarchy extends React.Component {
     fetchFile(i) {
         const dir = this.state.organized[i];
         fetch(user2url["post"]["readFile"], {
-            body: JSON.stringify({"user": this.state.user, "fid": dir["id"]}),
+            body: JSON.stringify({"fid": dir["id"]}),
+            headers: {
+                "Authorization": window.localStorage.getItem("token")
+            },
             method: 'POST'
         })
             .then(response => response.json())
@@ -76,15 +83,14 @@ class Hierarchy extends React.Component {
     }
 
     /**
-     * The callback function for stopping to display the file and return to the tree view.
-     * @param childData
+     * stopping to display the file and return to the tree view.
      */
-    callbackStopDisplayingFile = (childData) => {
+    callbackStopDisplayingFile = () => {
         this.setState({fileOnDisplay: -1});
     }
 
     /**
-     * The callback function for modifying file
+     * modifying file
      * The file modified will be the current file on display
      * @param {string} childData
      */
@@ -95,17 +101,24 @@ class Hierarchy extends React.Component {
         }
         fetch(user2url["post"]["modifyFile"], {
             body: JSON.stringify({
-                "user": this.state.user,
                 "fid": this.state.organized[this.state.fileOnDisplay]["id"],
                 "new_c": childData}),
+            headers: {
+                "Authorization": window.localStorage.getItem("token")
+            },
             method: 'POST'
         }).catch(error => console.error("Error when modifying file: ", error))
-            .then(() => alert("success"))
-        this.setState({content: childData})
+            .then(response => response.json())
+            .then(response => {
+                alert(response["msg"]);
+                if (response["ok"]) {
+                    this.setState({content: childData})
+                }
+            })
     }
 
     /**
-     * The callback function for renaming a file or a directory.
+     * renaming a file or a directory.
      * The file renamed will be the current file on display.
      * @param childData
      */
@@ -149,11 +162,13 @@ class Hierarchy extends React.Component {
         if (window.confirm(msg)) {
             fetch(user2url["post"]["rename"], {
                 body: JSON.stringify({
-                    "user": this.state.user,
                     "obj_id": objId,
                     "dir": isDir,
                     "new_name": newName
                 }),
+                headers: {
+                    "Authorization": window.localStorage.getItem("token")
+                },
                 method: 'POST'
             }).catch(error => console.error("Error when renaming", error))
                 .then(() => alert("success"))
@@ -169,7 +184,7 @@ class Hierarchy extends React.Component {
     }
 
     /**
-     * The callback function for creating a new file or a directory.
+     * creating a new file or a directory.
      * @param childData
      */
     callbackCreate = (childData) => {
@@ -184,12 +199,14 @@ class Hierarchy extends React.Component {
         }
         fetch(user2url["post"]["create"], {
             body: JSON.stringify({
-                "user": this.state.user,
                 "dir": isDir,
                 "name": name,
                 "new_content": content,
                 "parent_id": parentId
             }),
+            headers: {
+                "Authorization": window.localStorage.getItem("token")
+            },
             method: 'POST'
         }).catch(error => console.error("Error when creating", error))
             .then(() => alert("success"))
@@ -197,7 +214,7 @@ class Hierarchy extends React.Component {
     }
 
     /**
-     * The callback function for deleting a dir or a file.
+     * deleting a dir or a file.
      * The dir to be deleted must have been empty.
      * @param childData
      */
@@ -210,7 +227,7 @@ class Hierarchy extends React.Component {
             console.error("Error when deleting: id or type does not match")
             return
         }
-        let type = "";
+        let type;
         if (isDir) {
             type = " directory "
         } else {
@@ -222,17 +239,19 @@ class Hierarchy extends React.Component {
         }
         fetch(user2url["post"]["delete"], {
             body: JSON.stringify({
-                "user": this.state.user,
                 "obj_id": objId,
                 "dir": isDir
             }),
+            headers: {
+                "Authorization": window.localStorage.getItem("token")
+            },
             method: 'POST'
         }).catch(error => alert("Error when deleting. Probably the dir is not empty."))
             .then(() => this.fetchAndSort())  //todo: change to a cheaper way
     }
 
     /**
-     * The callback function for marking a dir as the potential new parent node.
+     * marking a dir as the potential new parent node.
      * @param childData
      */
     callbackMark = (childData) => {
@@ -252,7 +271,7 @@ class Hierarchy extends React.Component {
     }
 
     /**
-     * The callback function for moving a dir or a file.
+     * moving a dir or a file.
      * @param childData
      */
     callbackMove = (childData) => {
@@ -260,7 +279,6 @@ class Hierarchy extends React.Component {
             alert("No parent node selected yet.")
             return
         }
-        let user = this.state.user;
         let objId = childData["objId"];
         let isDir = childData["isDir"];
         let index = childData["index"];
@@ -284,15 +302,72 @@ class Hierarchy extends React.Component {
         if (window.confirm(msg)) {
             fetch(user2url["post"]["move"], {
                 body: JSON.stringify({
-                    "user": user,
                     "obj_id": objId,
                     "dir": isDir,
                     "new_parent_id": this.state.markedId
                 }),
+                headers: {
+                    "Authorization": window.localStorage.getItem("token")
+                },
                 method: 'POST'
             }).catch(error => alert("Error moving"))
                 .then(() => this.fetchAndSort())  //todo: change to a cheaper way
         }
+    }
+
+    /**
+     * logging in (callback part)
+     * @param {JSON} childData
+     */
+    callbackLogin = (childData) => {
+        let name = childData["name"];
+        let pwd = childData["pwd"];
+        fetch(user2url["post"]["login"], {
+            body: JSON.stringify({
+                "username": name,
+                "password": pwd
+            }),
+            method: 'POST'
+        }).catch(error => console.error(error))
+            .then(response => response.json())
+            .then(response => this.login(response))
+    }
+
+    /**
+     * logging in (continuing the callback part)
+     * @param {JSON} response
+     */
+    login(response) {
+        if (response["ok"]) {
+            window.localStorage.setItem("token", response["token"])
+            this.fetchAndSort()
+            this.setState({login: true})
+        } else {
+            alert("Fail to login. Please check your username and password.")
+        }
+    }
+
+    /**
+     * logging out
+     */
+    logout() {
+        let tk =  window.localStorage.getItem("token");
+        if (tk === null) {
+            alert("you have not logged in yet")
+            return
+        }
+
+        fetch(user2url["get"]["logout"], {
+            headers: {
+                "Authorization": tk
+            },
+            method: 'GET'
+        }).catch(error => console.error(error))
+            .then(response => response.json())
+            .then(response => alert(response["msg"]))
+
+        window.localStorage.removeItem("token");
+        this.setState({login: false})
     }
 
     /**
@@ -318,28 +393,38 @@ class Hierarchy extends React.Component {
         }
     }
 
+
+
     render() {
-        const welcome = (
-            <div>
-                <h1 className={"hierarchy-h1"}>{"Welcome user: " + this.state.user}</h1>
-            </div>
-        );
+        let logout;
+        let login;
         let visFile;
-        if (this.state.fileOnDisplay !== -1) {
-            visFile = <FileVis filename={this.state.filename} content={this.state.content}
-                               index={this.state.fileOnDisplay} id={this.state.fileOnDisplayId}
-                               callbackStopDisplayingFile={this.callbackStopDisplayingFile}
-                               callbackModifyFile={this.callbackModifyFile}
-                               callbackRename={this.callbackRename}
-                               callbackDelete={this.callbackDelete}/>
-        }
         let tree;
-        if (this.state.fileOnDisplay === -1) {
-            tree = this.state.organized.map((x, i) => this.display(x, i));
+
+        logout = <button className={"basic-btn"} onClick={() => this.logout()}>Logout</button>
+
+        if (!this.state.login) {
+            login = <Login callbackLogin={this.callbackLogin}/>
+        } else {
+            //this.fetchAndSort()
+            if (this.state.fileOnDisplay !== -1) {
+                visFile = <FileVis filename={this.state.filename} content={this.state.content}
+                                   index={this.state.fileOnDisplay} id={this.state.fileOnDisplayId}
+                                   callbackStopDisplayingFile={this.callbackStopDisplayingFile}
+                                   callbackModifyFile={this.callbackModifyFile}
+                                   callbackRename={this.callbackRename}
+                                   callbackDelete={this.callbackDelete}/>
+            }
+
+            if (this.state.fileOnDisplay === -1) {
+                tree = this.state.organized.map((x, i) => this.display(x, i));
+            }
         }
+
         return (
             <div className={"div-hierarchy"}>
-                {welcome}
+                {logout}
+                {login}
                 {tree}
                 {visFile}
             </div>

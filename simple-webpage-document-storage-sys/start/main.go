@@ -16,11 +16,17 @@ import (
 
 func addMiddleware(router *gin.Engine) {
 	router.Use(controller.SetHeader())
-	router.Use(controller.DecodeToken())
+	router.Use(controller.DecodeToken())  //todo: disable this for login
 }
 
 func bindUrl(router *gin.Engine) {
-	router.GET("/default-view/view", controller.DefaultViewSkeleton)
+	// view the directories and files
+	router.GET("/filesystem/view", controller.ViewHierarchy)
+
+	// login
+	router.POST("filesystem/login", controller.Login)
+	// logout
+	router.GET("filesystem/logout", controller.Logout)
 
 	// url for fetching file content
 	router.POST("/filesystem/read", controller.GetFile)
@@ -72,7 +78,7 @@ func main() {
 
 	// start the manager which maintains the user info
 	manager.StartManager(common.Path_index_of_users)
-	defer manager.SaveModifiedUserCollections()
+	defer manager.SaveWhenShuttingDown()
 
 	// config the router
 	router := gin.Default()

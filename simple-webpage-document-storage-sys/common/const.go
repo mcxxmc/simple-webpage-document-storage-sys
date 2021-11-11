@@ -2,9 +2,6 @@ package common
 
 const LetterBytes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-// DefaultUserId the default user id for manager for testing
-const DefaultUserId = "0"
-
 // RootId the id for the root dir of any user
 const RootId = "ROOT"
 

@@ -7,7 +7,7 @@ import (
 	"simple-webpage-document-storage-sys/manager"
 )
 
-const userId = common.DefaultUserId
+const userId = "0"
 const dirId1 = "1001"
 const dirId2 = "1002"
 

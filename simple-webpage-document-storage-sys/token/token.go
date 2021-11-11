@@ -8,9 +8,10 @@ import (
 )
 
 const signingKey = "simple"
+const s1Token = "token"
 
 type MyClaims struct {
-	Uid string `json:"uid"`
+	Uid []byte `json:"uid"`
 	jwt.StandardClaims
 }
 
@@ -18,12 +19,12 @@ type MyClaims struct {
 func GenerateToken(uid string) (string, error) {
 	expire := time.Now().Add(time.Hour)
 	claims := MyClaims{
-		Uid: uid,
+		Uid: []byte(uid),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expire.Unix(),
 		},
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString([]byte(signingKey))
 }
@@ -38,9 +39,14 @@ func DecodeToken(tokenStr string) (string, bool) {
 		}
 		return []byte(signingKey), nil
 	})
-	logging.ConditionalLogError(err)
+
+	if err != nil {
+		logging.Error(err, logging.S(s1Token, tokenStr))
+		return "", false
+	}
+
 	if claims, ok := token.Claims.(*MyClaims); ok && token.Valid {
-		return claims.Uid, true
+		return string(claims.Uid), true
 	}
 	return "", false
 }
