@@ -14,5 +14,6 @@ export const user2url = {
         "delete": "http://localhost:8080/filesystem/remove",
         "move": "http://localhost:8080/filesystem/move",
         "login": "http://localhost:8080/filesystem/login",
+        "register": "http://localhost:8080/filesystem/register",
     }
 }

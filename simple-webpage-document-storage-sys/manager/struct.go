@@ -114,7 +114,7 @@ func (manager *Manager) modifyTxt(userId string, fileId string, newContent strin
 
 // creates a txt file with content
 //
-// note that the real new filename on disk equals to newFileId.txt instead of newFileName (to avoid collision)
+// note that the real new filename on disk equals to newFileId instead of newFileName (to avoid collision)
 func (manager *Manager) createTxt(userId string, newFileId string, newFileName string,
 	newContent string, parentId string) bool {
 
@@ -147,7 +147,7 @@ func (manager *Manager) createTxt(userId string, newFileId string, newFileName s
 	}
 
 	// create a new Image
-	newPath := common.NewTxtPath(newFileId + ".txt", userId)  // alter the file name here
+	newPath := common.NewTxtPath(newFileId, userId)
 	level := parent.Level + 1
 	newImg := &filesys.Image{ID: newFileId, Dir: false, Name: newFileName, Level: level,
 		Children: []string{newPath}, Parent: parentId}
@@ -245,6 +245,22 @@ func (manager *Manager) move(userId string, objectId string, newParentId string)
 	img.Parent = newParentId
 	img.Level = newParent.Level + 1
 	newParent.Children = append(newParent.Children, objectId)
+
+	// if the collection to be moved is a directory, need to update the level of its children too
+	if img.Dir {
+		var recursivelyUpdateLevel func(image *filesys.Image, parentLvl int)
+		recursivelyUpdateLevel = func(image *filesys.Image, parentLvl int) {
+			image.Level = parentLvl + 1
+			if image.Dir {
+				for _, child := range image.Children {
+					recursivelyUpdateLevel(collection[child], image.Level)
+				}
+			}
+		}
+		for _, child := range img.Children {
+			recursivelyUpdateLevel(collection[child], img.Level)
+		}
+	}
 
 	manager.Modified[userId] = true
 

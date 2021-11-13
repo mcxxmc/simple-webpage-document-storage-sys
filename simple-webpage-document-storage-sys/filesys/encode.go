@@ -93,3 +93,17 @@ func CreateNewUserProfile(path string) error {
 	err = ioutil.WriteFile(path, byteVal, 0644)
 	return err
 }
+
+// CreatePhysicalDirForUser creates a physical directory on disk for the new user
+//
+// note that it does not throw an error even if the directory already exists; the handling of duplicate uids should
+// be accomplished at an upper layer
+func CreatePhysicalDirForUser(uid string) bool {
+	path := common.Path_txt_prefix + uid
+	err := os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		logging.Error(err, logging.S("user id: ", uid))
+		return false
+	}
+	return true
+}

@@ -20,8 +20,12 @@ class Login extends React.Component {
         this.setState({pwd: event.target.value})
     }
 
-    connect() {
+    login() {
         this.props.callbackLogin({"name": this.state.name, "pwd": this.state.pwd})
+    }
+
+    register() {
+        this.props.callbackRegister({"name": this.state.name, "pwd": this.state.pwd})
     }
 
     render() {
@@ -33,7 +37,8 @@ class Login extends React.Component {
                 <br/>
                 <p>Password</p><input onChange={this.handlePwd}/>
                 <br/>
-                <button className={"basic-btn button-confirm"} onClick={() => this.connect()}>Confirm</button>
+                <button className={"basic-btn button-confirm"} onClick={() => this.login()}>Confirm</button>
+                <button className={"basic-btn button-create"} onClick={() => this.register()}>Register</button>
             </div>
         )
     }

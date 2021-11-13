@@ -33,8 +33,8 @@ func Fatal(err error, sss ...SS) {
 	logger.Fatal("", fields...)
 }
 
-// ConditionalLogError logs the error if the error is not nil
-func ConditionalLogError(err error, sss ...SS) {
+// ConditionallyLoggingError logs the error if the error is not nil
+func ConditionallyLoggingError(err error, sss ...SS) {
 	if err != nil {
 		Error(err, sss...)
 	}

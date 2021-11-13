@@ -1,6 +1,8 @@
 import React from "react";
 import "./css/file-vis.css"
 
+const maxStackCapacity = 20;  // the max length of this.history
+
 class FileVis extends React.Component {
 
     constructor(props) {
@@ -15,18 +17,19 @@ class FileVis extends React.Component {
         }
         this.handleChangeCtt = this.handleChangeCtt.bind(this)
         this.handleChangeRename = this.handleChangeRename.bind(this)
+        // basically, undo and redo are 2 stacks (but when they are full they might behaviour like queues)
+        this.undo = []  // every time the content is updated, an old version is added to undo
+        this.redo = []  // every time undo pops something, the replaced version of content is added to redo
     }
 
-    // check if there is a change in the state (due to changes from the parent)
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevState.name !== this.props.filename) {
-            this.setState({
-                name: this.props.filename,
-                id: this.props.id,
-                index: this.props.index,
-                content: this.props.content,
-                rename: false,
-                newName: this.props.filename})
+    // does not need componentDidUpdate() here because this component will be destroyed when quitting
+
+    // used to update this.undo & this.redo
+    currentHistory() {
+        if (this.state.content && this.state.content.length > 0) {
+            return this.state.content.slice(0)  // make a copy
+        } else {
+            return ""
         }
     }
 
@@ -35,6 +38,11 @@ class FileVis extends React.Component {
      * @param event
      */
     handleChangeCtt(event) {
+        const copy = this.currentHistory()
+        if (this.undo.length === maxStackCapacity) {
+            this.undo = this.undo.slice(1)  // abandon the oldest version; this behaviour is like a queue
+        }
+        this.undo.push(copy)
         this.setState({content: event.target.value})
     }
 
@@ -73,8 +81,12 @@ class FileVis extends React.Component {
                 {rename}
                 <br/>
                 <textarea value={this.state.content} onChange={this.handleChangeCtt} className={"file-vis-textarea"}/>
+                <button onClick={() => this.undo_f()} disabled={this.undo.length <= 0}
+                    className={"small-basic-btn"}>Undo</button>
+                <button onClick={() => this.redo_f()} disabled={this.redo.length <= 0}
+                    className={"small-basic-btn"}>Redo</button>
                 <button onClick={() => this.commit()}
-                        className={"basic-btn button-confirm"}>Commit</button>
+                        className={"basic-btn button-confirm"}>Save</button>
             </div>
         )
     }
@@ -86,7 +98,7 @@ class FileVis extends React.Component {
     rename() {
         this.props.callbackRename({"index": this.state.index, "objId": this.state.id, "isDir": false,
             "newName": this.state.newName.trim()})
-        this.setState({rename: false})
+        this.setState({name: this.state.newName, rename: false})
     }
 
     delete() {
@@ -95,6 +107,32 @@ class FileVis extends React.Component {
 
     quit() {
         this.props.callbackStopDisplayingFile({"quit": true})
+    }
+
+    undo_f() {
+        if (this.undo.length === 0) {
+            return
+        }
+        const pop = this.undo.pop()
+        const copy = this.currentHistory()
+        if (this.redo.length === maxStackCapacity) {
+            this.redo = this.redo.slice(1)
+        }
+        this.redo.push(copy)
+        this.setState({content: pop})
+    }
+
+    redo_f() {
+        if (this.redo.length === 0) {
+            return
+        }
+        const pop = this.redo.pop()
+        const copy = this.currentHistory()
+        if (this.undo.length === maxStackCapacity) {
+            this.undo = this.undo.slice(1)
+        }
+        this.undo.push(copy)
+        this.setState({content: pop})
     }
 }
 

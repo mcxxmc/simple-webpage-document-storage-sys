@@ -28,6 +28,9 @@ func bindUrl(router *gin.Engine) {
 	// logout
 	router.GET("filesystem/logout", controller.Logout)
 
+	// new user
+	router.POST("filesystem/register", controller.NewUser)
+
 	// url for fetching file content
 	router.POST("/filesystem/read", controller.GetFile)
 	// url for modifying file content

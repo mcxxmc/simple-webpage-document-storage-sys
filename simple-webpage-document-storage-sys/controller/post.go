@@ -26,19 +26,23 @@ func ExtractAndVerify(c *gin.Context) (string, bool) {
 func Login(c *gin.Context) {
 	request := &RequestLogin{}
 	err := c.BindJSON(request)
-	logging.ConditionalLogError(err)
+	if err != nil {
+		logging.Error(err)
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "invalid request"})
+		return
+	}
 
 	uid, b := manager.VerifyUserPassword(request.Username, request.Password)
 
 	if !b {
-		c.JSON(http.StatusOK, &LoginResponse{Ok: false, Token: ""})
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "fail to login; invalid username and password"})
 		return
 	}
 
 	tk, err := token.GenerateToken(uid)
 	if err != nil {
 		logging.Error(err)
-		c.JSON(http.StatusOK, &LoginResponse{Ok: false, Token: ""})
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "internal error: fail to generate token"})
 		return
 	}
 
@@ -51,7 +55,11 @@ func Login(c *gin.Context) {
 func GetFile(c *gin.Context) {
 	request := &RequestFile{}
 	err := c.BindJSON(request)
-	logging.ConditionalLogError(err)
+	if err != nil {
+		logging.Error(err)
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "invalid request"})
+		return
+	}
 
 	uid, b := ExtractAndVerify(c)
 
@@ -68,7 +76,11 @@ func GetFile(c *gin.Context) {
 func ModifyFile(c *gin.Context) {
 	request := &RequestModifyFile{}
 	err := c.BindJSON(request)
-	logging.ConditionalLogError(err)
+	if err != nil {
+		logging.Error(err)
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "invalid request"})
+		return
+	}
 
 	uid, b := ExtractAndVerify(c)
 
@@ -92,7 +104,11 @@ func ModifyFile(c *gin.Context) {
 func Rename(c *gin.Context) {
 	request := &RequestRename{}
 	err := c.BindJSON(request)
-	logging.ConditionalLogError(err)
+	if err != nil {
+		logging.Error(err)
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "invalid request"})
+		return
+	}
 
 	uid, b := ExtractAndVerify(c)
 
@@ -121,7 +137,11 @@ func Rename(c *gin.Context) {
 func Create(c *gin.Context) {
 	request := &RequestCreate{}
 	err := c.BindJSON(request)
-	logging.ConditionalLogError(err)
+	if err != nil {
+		logging.Error(err)
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "invalid request"})
+		return
+	}
 
 	uid, b := ExtractAndVerify(c)
 
@@ -132,6 +152,7 @@ func Create(c *gin.Context) {
 
 	b = false
 	objId := common.GenerateRandomId(64)
+
 	if request.Dir {
 		b = manager.CreateDir(uid, objId, request.Name, request.ParentId)
 	} else {
@@ -152,7 +173,11 @@ func Create(c *gin.Context) {
 func Delete(c * gin.Context) {
 	request := &RequestDelete{}
 	err := c.BindJSON(request)
-	logging.ConditionalLogError(err)
+	if err != nil {
+		logging.Error(err)
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "invalid request"})
+		return
+	}
 
 	uid, b := ExtractAndVerify(c)
 
@@ -181,7 +206,11 @@ func Delete(c * gin.Context) {
 func Move(c *gin.Context) {
 	request := &RequestMove{}
 	err := c.BindJSON(request)
-	logging.ConditionalLogError(err)
+	if err != nil {
+		logging.Error(err)
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "invalid request"})
+		return
+	}
 
 	uid, b := ExtractAndVerify(c)
 
@@ -205,4 +234,33 @@ func Move(c *gin.Context) {
 			logging.SS{S1: s1ParentId, S2: request.NewParentId})
 		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "fail to move"})
 	}
+}
+
+// NewUser for creating new users
+func NewUser(c *gin.Context) {
+	request := &RequestNewUser{}  // TODO: maybe can be replaced by RequestLogin
+	err := c.BindJSON(request)
+	if err != nil {
+		logging.Error(err)
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "invalid request"})
+		return
+	}
+
+	uid, b := manager.CreateNewUser(request.Username, request.Password)
+
+	if !b {
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: uid})  // here uid is an error msg
+		return
+	}
+
+	tk, err := token.GenerateToken(uid)
+	if err != nil {
+		logging.Error(err)
+		c.JSON(http.StatusOK, &CommonResponse{Ok: false, Msg: "internal error: fail to generate token"})
+		return
+	}
+
+	manager.RegisterUser(uid)  // register the user here
+
+	c.JSON(http.StatusOK, &LoginResponse{Ok: true, Token: tk})
 }

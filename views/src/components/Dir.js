@@ -49,7 +49,11 @@ class Dir extends React.Component {
     }
 
     handleChangeCreateType(event) {
-        this.setState({createDir: event.target.value})
+        if (event.target.value === "true" || event.target.value === "false") {
+            this.setState({createDir: JSON.parse(event.target.value)})
+        } else {
+            this.setState({createDir: "undefined"})
+        }
     }
 
     rename() {

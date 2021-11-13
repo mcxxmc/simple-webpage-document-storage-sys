@@ -22,9 +22,12 @@ const errorUserNotLoggedIn = "the user has not logged in"
 
 const errorDirNotEmpty = "the directory is not empty"
 
+const errorUsernameUsed = "the username is already used"
+
 const s1userId = "user id: "
 const s1fileId = "file id: "
 const s1dirId = "directory id: "
 const s1objectId = "file or directory id: "
 const s1parentId = "parent id: "
 const s1time = "timestamp: "
+const s1username = "username: "

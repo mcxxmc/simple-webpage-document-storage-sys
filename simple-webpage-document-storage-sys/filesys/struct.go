@@ -30,6 +30,7 @@ type Image struct {
 // map structure = Image id : *Image
 type Collection map[string]*Image // passed by pointer
 
+// Profile a new profile for a new user containing only the root directory
 type Profile struct {
 	ROOT struct {
 		Id       string        `json:"id"`

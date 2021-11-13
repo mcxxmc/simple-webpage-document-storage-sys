@@ -1,13 +1,14 @@
 package manager
 
 import (
+	"errors"
 	"simple-webpage-document-storage-sys/common"
 	"simple-webpage-document-storage-sys/filesys"
 	"simple-webpage-document-storage-sys/logging"
 )
 
 var defaultManager *Manager
-var cached *filesys.IndexesOfUsers  // TODO: replace this with MySQL
+var cached *filesys.IndexesOfUsers  // TODO: replace this with MySQL; also, it can be created as 2 related tables (uid and uname as keys)
 
 // NumberOfUsers returns the number of users logged in
 func NumberOfUsers() int {
@@ -105,7 +106,7 @@ func StartManager(path string) {
 //TODO: deprecate this function and replace it in the test cases
 func SaveUserCollection(userId string) {
 	err := filesys.SaveUserCollection((*cached)[userId].Profile, defaultManager.userCollection(userId))
-	logging.ConditionalLogError(err, logging.S(s1userId, userId))
+	logging.ConditionallyLoggingError(err, logging.S(s1userId, userId))
 }
 
 // SaveModifiedUserCollections saves all the modified user collections to disk
@@ -125,7 +126,7 @@ func SaveModifiedUserCollections() {
 // should be called periodically or when the program shuts down.
 func SaveIndexesOfUsers() {
 	err := filesys.SaveIndexesOfUsers(common.Path_index_of_users, cached)
-	logging.ConditionalLogError(err)
+	logging.ConditionallyLoggingError(err)
 }
 
 // SaveWhenShuttingDown saves necessary info to disk when shutting down
@@ -149,6 +150,66 @@ func VerifyUserPassword(username, password string) (string, bool) {
 		}
 	}
 	return "", false
+}
+
+// IsUsernameAvailable checks if the username is available. True if the username has not been used.
+//
+// TODO: change to SQL
+func IsUsernameAvailable(username string) bool {
+	for _, user := range *cached {
+		if user.Name == username {
+			return false
+		}
+	}
+	return true
+}
+
+// IsUserIdAvailable checks if the user id is available. True if the user id has not been used.
+//
+// TODO: change to SQL
+func IsUserIdAvailable(id string) bool {
+	if _, exist := (*cached)[id]; exist {
+		return false
+	}
+	return true
+}
+
+// CreateNewUser creates a new user and add it to cache
+//
+// TODO: change to SQL
+func CreateNewUser(name, password string) (string, bool) {
+	if !IsUsernameAvailable(name) {
+		logging.Error(errors.New(errorUsernameUsed), logging.S(s1username, name))
+		return "username unavailable", false
+	}
+
+	uid := common.GenerateRandomId(64)
+	for {
+		if IsUserIdAvailable(uid) {
+			break
+		}
+		uid = common.GenerateRandomId(64)
+	}
+
+	profile := common.NewUserProfilePath(uid)
+	err := filesys.CreateNewUserProfile(profile)  // create and save the new profile to disk
+	if err != nil {
+		logging.Error(err)
+		return "internal error: fail to create user profile", false
+	}
+
+	newUser := &filesys.UserInfo{Name: name, Uid: uid, Password: password, Profile: profile}
+	(*cached)[uid] = newUser  // add it to the cache
+
+	// no need to add it to the manager here; that will be done by the controller
+
+	// IMPORTANT: create a physical dir for it on disk
+	b := filesys.CreatePhysicalDirForUser(uid)
+	if !b {
+		return "internal error: fail to create physical dir", false
+	}
+
+	return uid, true
 }
 
 

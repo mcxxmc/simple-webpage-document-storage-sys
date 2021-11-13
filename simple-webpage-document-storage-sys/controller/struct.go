@@ -74,3 +74,9 @@ type LoginResponse struct {
 	Ok bool `json:"ok"`
 	Token string `json:"token"`
 }
+
+// RequestNewUser the request to create a new user
+type RequestNewUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}

@@ -209,7 +209,8 @@ class Hierarchy extends React.Component {
             },
             method: 'POST'
         }).catch(error => console.error("Error when creating", error))
-            .then(() => alert("success"))
+            .then(response => response.json())
+            .then(response => response["ok"]? alert("success"): alert(response["msg"]))
         this.fetchAndSort()  //todo: change to a cheaper way
     }
 
@@ -343,7 +344,7 @@ class Hierarchy extends React.Component {
             this.fetchAndSort()
             this.setState({login: true})
         } else {
-            alert("Fail to login. Please check your username and password.")
+            alert(response["msg"])
         }
     }
 
@@ -368,6 +369,38 @@ class Hierarchy extends React.Component {
 
         window.localStorage.removeItem("token");
         this.setState({login: false})
+    }
+
+    /**
+     * register as a new user
+     * @param {JSON} childData
+     */
+    callbackRegister = (childData) => {
+        let name = childData["name"];
+        let pwd = childData["pwd"];
+        fetch(user2url["post"]["register"], {
+            body: JSON.stringify({
+                "username": name,
+                "password": pwd
+            }),
+            method: 'POST'
+        }).catch(error => console.error(error))
+            .then(response => response.json())
+            .then(response => this.register(response))
+    }
+
+    /**
+     * reigister as a new user (continuing the callback part)
+     * @param {JSON} response
+     */
+    register(response) {
+        if (response["ok"]) {
+            window.localStorage.setItem("token", response["token"])
+            this.fetchAndSort()
+            this.setState({login: true})
+        } else {
+            alert(response["msg"])
+        }
     }
 
     /**
@@ -404,7 +437,7 @@ class Hierarchy extends React.Component {
         logout = <button className={"basic-btn"} onClick={() => this.logout()}>Logout</button>
 
         if (!this.state.login) {
-            login = <Login callbackLogin={this.callbackLogin}/>
+            login = <Login callbackLogin={this.callbackLogin} callbackRegister={this.callbackRegister}/>
         } else {
             //this.fetchAndSort()
             if (this.state.fileOnDisplay !== -1) {
