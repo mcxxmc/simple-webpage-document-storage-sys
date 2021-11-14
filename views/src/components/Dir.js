@@ -1,5 +1,6 @@
 import React from "react";
 import {tab} from "../constants/constants";
+import {checkValidInput} from "../constants/validation";
 import "./css/dir.css"
 
 class Dir extends React.Component {
@@ -16,7 +17,8 @@ class Dir extends React.Component {
             create: false,  // if the user is creating a new dir or file
             createName: "new",  // the name of the new dir or file to be created
             createDir: true,  // if the newly-created object is a dir
-            show: true,
+            show: this.props.show,
+            collapse: false,
         }
         this.handleChangeRename = this.handleChangeRename.bind(this);
         this.handleChangeCreateName = this.handleChangeCreateName.bind(this);
@@ -35,7 +37,8 @@ class Dir extends React.Component {
                 create: false,
                 createName: "new",
                 createDir: true,
-                show: true,
+                show: this.props.show,
+                collapse: false
             })
         }
     }
@@ -57,16 +60,20 @@ class Dir extends React.Component {
     }
 
     rename() {
-        this.props.callbackRename({"index": this.state.index, "objId": this.state.id, "isDir": true,
-            "newName": this.state.newName.trim()})
-        this.setState({rename: false})
+        if (checkValidInput(this.state.newName)) {
+            this.props.callbackRename({"index": this.state.index, "objId": this.state.id, "isDir": true,
+                "newName": this.state.newName.trim()})
+            this.setState({rename: false})
+        }
     }
 
     create() {
         let name = this.state.createName.trim();
-        this.props.callbackCreate({"parentIndex": this.state.index, "parentId": this.state.id,
-            "isDir": this.state.createDir, "name": name})
-        this.setState({create: false, createName: "new", createDir: true})
+        if (checkValidInput(name)) {
+            this.props.callbackCreate({"parentIndex": this.state.index, "parentId": this.state.id,
+                "isDir": this.state.createDir, "name": name})
+            this.setState({create: false, createName: "new", createDir: true})
+        }
     }
 
     delete() {
@@ -81,10 +88,18 @@ class Dir extends React.Component {
         this.props.callbackMove({"objId": this.state.id, "isDir": true, "index": this.state.index})
     }
 
+    collapse() {
+
+    }
+
     render() {
         if (!this.state.show) {
             return
         }
+        let collapse = (
+            <button className={"btn-collapse"} onClick={() => this.collapse()}>
+                {this.state.collapse? "^": ">"}</button>
+        );
         let rename;
         if (this.state.rename) {
             rename = (
@@ -115,11 +130,13 @@ class Dir extends React.Component {
                 </div>
             )
         }
+        /* for input, using props instead of state to allow it to update dynamically */
         return (
             <div className={"div-dir-2"}>
                 <div className={"div-flex"}>
+                    {collapse}
                     <input readOnly={true} className={"input-readOnly"} style={this.props.style}
-                           value={tab.repeat(this.state.level) + this.state.name}/>
+                           value={tab.repeat(this.props.level) + this.props.name}/>
                     <button className={"small-basic-btn button-mark"}
                             onClick={() => this.mark()}>Mark</button>
                     <button className={"small-basic-btn button-move"}

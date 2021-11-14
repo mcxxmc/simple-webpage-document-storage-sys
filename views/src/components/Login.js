@@ -1,4 +1,5 @@
 import React from "react";
+import {checkValidInput} from "../constants/validation";
 
 class Login extends React.Component {
 
@@ -21,17 +22,24 @@ class Login extends React.Component {
     }
 
     login() {
-        this.props.callbackLogin({"name": this.state.name, "pwd": this.state.pwd})
+        if (checkValidInput(this.state.name) && checkValidInput(this.state.pwd)) {
+            this.props.callbackLogin({"name": this.state.name, "pwd": this.state.pwd})
+        }
     }
 
     register() {
-        this.props.callbackRegister({"name": this.state.name, "pwd": this.state.pwd})
+        if (checkValidInput(this.state.name) && checkValidInput(this.state.pwd)) {
+            this.props.callbackRegister({"name": this.state.name, "pwd": this.state.pwd})
+        }
     }
 
     render() {
         return (
             <div className={"div-login"}>
                 <h1>Login</h1>
+                <br/>
+                <p>Please note that your input can only contain numbers, dash, underscore
+                    and letters a-z (uppercase and lowercase).</p>
                 <br/>
                 <p>Name</p><input onChange={this.handleName}/>
                 <br/>

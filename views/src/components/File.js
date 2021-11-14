@@ -20,6 +20,7 @@ class File extends React.Component {
     render() {
         return (
             <div className={"div-flex"}>
+                <button className={"btn-collapse"}>.</button>
                 <input readOnly={true} className={"input-readOnly"}
                        value={tab.repeat(this.props.level) + this.props.name}/>
                 {/* eslint-disable-next-line no-script-url */}

@@ -412,6 +412,7 @@ class Hierarchy extends React.Component {
         if (x["dir"] === true) {
             return <Dir id={x["id"]} name={x["name"]} level={x["level"]} index={i}
                         key={i}
+                        show={true}
                         style={{backgroundColor:
                                 this.state.markedIndex === i && this.state.markedId === x["id"]? "red": "transparent"}}
                         callbackRename={this.callbackRename}

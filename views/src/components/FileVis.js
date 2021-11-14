@@ -1,5 +1,6 @@
 import React from "react";
 import "./css/file-vis.css"
+import {checkValidInput} from "../constants/validation";
 
 const maxStackCapacity = 20;  // the max length of this.history
 
@@ -96,9 +97,12 @@ class FileVis extends React.Component {
     }
 
     rename() {
-        this.props.callbackRename({"index": this.state.index, "objId": this.state.id, "isDir": false,
-            "newName": this.state.newName.trim()})
-        this.setState({name: this.state.newName, rename: false})
+        let name = this.state.newName.trim();
+        if (checkValidInput(name)) {
+            this.props.callbackRename({"index": this.state.index, "objId": this.state.id, "isDir": false,
+                "newName": name})
+            this.setState({name: this.state.newName, rename: false})
+        }
     }
 
     delete() {
