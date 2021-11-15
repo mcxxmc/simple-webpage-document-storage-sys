@@ -7,7 +7,7 @@
 Keyword: document-based database system, Golang, Gin framework, React.
 
 
-A simple implementation to simulate a database system maintaining documents (instead of tables).
+A simple implementation to simulate a document-based database system (instead of tables).
 
 
 Backend supported by go and includes a gin server. Frontend is currently developed in React.
