@@ -197,6 +197,12 @@ func (manager *Manager) deleteTxt(userId string, fileId string) bool {
 		manager.Modified[userId] = true
 		return true
 	} else {
+		/*
+		oldParent.Children = removeString(oldParent.Children, fileId)
+		delete(collection, fileId)
+		manager.Modified[userId] = true
+		 */
+		// the codes commented out above enable the user to just delete a possible phantom file; use it at your own risk
 		return false
 	}
 }

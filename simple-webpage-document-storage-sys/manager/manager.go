@@ -8,7 +8,8 @@ import (
 )
 
 var defaultManager *Manager
-var cached *filesys.IndexesOfUsers  // TODO: replace this with MySQL; also, it can be created as 2 related tables (uid and uname as keys)
+var cached *filesys.IndexesOfUsers
+// TODO: replace "cached" with MySQL; also, it can be created as 2 related tables (uid and uname as keys for each table)
 
 // NumberOfUsers returns the number of users logged in
 func NumberOfUsers() int {
@@ -100,11 +101,8 @@ func StartManager(path string) {
 	defaultManager = &Manager{Collections: make(map[string]*filesys.Collection), Modified: make(map[string]bool)}
 }
 
-// SaveUserCollection saves the user collection (as a JSON file) to disk
-//
-// should avoid using this
-//TODO: deprecate this function and replace it in the test cases
-func SaveUserCollection(userId string) {
+// saveUserCollection saves the user collection (as a JSON file) to disk
+func saveUserCollection(userId string) {
 	err := filesys.SaveUserCollection((*cached)[userId].Profile, defaultManager.userCollection(userId))
 	logging.ConditionallyLoggingError(err, logging.S(s1userId, userId))
 }
@@ -115,7 +113,7 @@ func SaveUserCollection(userId string) {
 func SaveModifiedUserCollections() {
 	for uid, b := range defaultManager.Modified {
 		if b {
-			SaveUserCollection(uid)
+			saveUserCollection(uid)
 			defaultManager.Modified[uid] = false
 		}
 	}
